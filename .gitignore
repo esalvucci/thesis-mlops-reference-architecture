@@ -1,1 +1,3 @@
 simple_pipeline/src/data_preparation_component/link_dataset
+simple_pipeline/pipeline/__pycache__/
+simple_pipeline/pipeline/pipeline.tar.gz

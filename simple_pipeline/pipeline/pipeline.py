@@ -7,7 +7,7 @@ def pipeline():
 def data_preparation_step():
     return dsl.ContainerOp(
             name='data_preparation',
-            image='docker.io/enricosalvucci/pipeline-example:latest',
+            image='docker.io/enricosalvucci/data_preparation:latest',
             arguments=['--output_path', '/tmp/output.txt'],
             file_outputs={'output': '/tmp/output.txt'}
     )
