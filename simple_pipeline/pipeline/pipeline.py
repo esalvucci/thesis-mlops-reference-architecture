@@ -1,14 +1,15 @@
 import kfp.dsl as dsl
 
-@dsl.pipeline()
-def pipeline():
-    data_preparation = data_preparation_step()
+@dsl.pipeline(name='Divina Commedia Example')
+def pipeline(input_dataset_url):
+    data_preparation = data_preparation_step(input_dataset_url)
 
-def data_preparation_step():
+def data_preparation_step(input_dataset_url):
     return dsl.ContainerOp(
             name='data_preparation',
             image='docker.io/enricosalvucci/data_preparation:latest',
-            arguments=['--output_path', '/tmp/output.txt'],
+            arguments=['--input_dataset_url', input_dataset_url,
+                       '--output_path', '/tmp/output.txt'],
             file_outputs={'output': '/tmp/output.txt'}
     )
     

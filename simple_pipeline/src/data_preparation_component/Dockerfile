@@ -2,7 +2,6 @@ FROM python:3
 
 WORKDIR /app
 
-RUN wget https://raw.githubusercontent.com/dlang/druntime/master/benchmark/extra-files/dante.txt
 COPY data_preparation.py .
 COPY requirements.txt .
 
