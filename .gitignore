@@ -1,4 +1,6 @@
-simple_pipeline/src/data_preparation_component/link_dataset
-simple_pipeline/pipeline/__pycache__/
-simple_pipeline/pipeline/pipeline.tar.gz
+simple_data_passing/src/data_preparation_component/link_dataset
+simple_data_passing/pipeline/__pycache__/
+simple_data_passing/pipeline/pipeline.tar.gz
+forecasting-example/pipeline/__pycache__/
+forecasting-example/pipeline/pipeline.tar.gz/
 .idea
