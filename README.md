@@ -43,6 +43,11 @@ To install Kubeflow Pipelines SDK on your local machine follow the instructions 
 Each example (unless otherwise noted) use docker containers in each step.
 To build an image from the Dockerfile (in each component) run the following instructions
 
+Make sure you are logged in your docker container registry
+```
+sudo docker login
+```
+
 On the command line run
 
 ```
