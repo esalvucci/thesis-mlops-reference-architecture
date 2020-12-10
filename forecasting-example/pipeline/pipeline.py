@@ -7,6 +7,7 @@ CONFIG_FILENAME = '../config.yaml'
 with open(CONFIG_FILENAME) as file:
     configuration_parameters = yaml.safe_load(file)
 
+
 def data_preparation_step():
 
     return kfp.dsl.ContainerOp(
