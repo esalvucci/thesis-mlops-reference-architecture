@@ -1,10 +1,9 @@
-import pickle
-
 from google.cloud import storage
-from sklearn.model_selection import KFold
-from sklearn.model_selection import cross_val_score
 import pandas as pd
+import os
 import fire
+import sklearn.metrics as metrics
+from xgboost import XGBRegressor, Booster
 
 
 def evaluate_model(dataset_name, model_path):
@@ -12,19 +11,33 @@ def evaluate_model(dataset_name, model_path):
     folder_path = 'forecast-example'
     client = storage.Client()
     bucket = client.get_bucket(bucket_name)
-    blob = bucket.get_blob('it.csv')
+    bucket.blob(os.path.join(folder_path, dataset_name)).download_to_filename(dataset_name)
 
-    model = pickle.load(open(model_path, 'wb'))
+    df = pd.read_csv(dataset_name)
+    df = df.drop(columns="end").set_index("start")
+    df = df.dropna()
 
-    x_dataset = pd.read_csv(x_dataset_name, index_col='time')
-    y_dataset = pd.read_csv(y_dataset_path, index_col='time')
+    df.index = pd.to_datetime(df.index, errors='coerce')
+    df.index.name = "time"
 
-    kfold = KFold(n_splits=10, random_state=7)
-    results = cross_val_score(model, x_dataset, y_dataset, cv=kfold)
-    accuracy_as_string = "Accuracy: %.2f%% (%.2f%%)" % (results.mean()*100, results.std()*100)
+    x_dataset = df.drop(columns='load')
+    y_dataset = df.loc[:, 'load']
 
-    with open('/tmp/accuracy.txt', 'w') as output_text:
-        output_text.write(accuracy_as_string)
+#    model = pickle.load(open(os.path.join(folder_path, model_path)))
+
+    model = XGBRegressor()
+    booster = Booster()
+    booster.load_model(model_path)
+    model._Booster = booster
+
+    predictions = model.predict(x_dataset)
+    print(predictions)
+
+    mean_squared_log_error = metrics.mean_squared_log_error(y_dataset, predictions)
+    print("mean_squared_log_error: " + str(mean_squared_log_error))
+
+    with open('/tmp/mean_squared_log_error.txt', 'w') as output_text:
+        output_text.write(str(mean_squared_log_error))
 
 
 if __name__ == "__main__":

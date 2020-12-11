@@ -40,26 +40,28 @@ def model_training_step(x_training_set, y_training_set, x_test_set, y_test_set):
 )
 
 
-def model_evaluation_step(x_dataset, y_dataset, model_path):
+def model_evaluation_step(dataset_name, model_path):
     return kfp.dsl.ContainerOp(
-            name='model evaluating',
+            name='model evaluation',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
-                  '/' + configuration_parameters['pipeline']['name'] + '-' + 'model-evaluating:latest',
-            arguments=['--x_dataset_path', kfp.dsl.InputArgumentPath(x_dataset),
-                       '--y_dataset_path', kfp.dsl.InputArgumentPath(y_dataset),
+                  '/' + configuration_parameters['pipeline']['name'] + '-' + 'model-evaluation:latest',
+            arguments=['--dataset_name', dataset_name,
                        '--model_path', kfp.dsl.InputArgumentPath(model_path)],
-            file_outputs={}
+            file_outputs={'accuracy': '/tmp/mean_squared_log_error.txt'}
 )
 
 
 @kfp.dsl.pipeline(name='Forecasting Example')
-def pipeline():
+def pipeline(evaluation_dataset_name='de.csv'):
     data_preparation = data_preparation_step()
     model_training = model_training_step(data_preparation.outputs['x_training_set'],
                         data_preparation.outputs['y_training_set'],
                         data_preparation.outputs['x_test_set'],
                         data_preparation.outputs['y_test_set'])
-    #model_evaluation_step(model_training.outputs['model_path'])
+    model_evaluation = model_evaluation_step(evaluation_dataset_name, model_training.outputs['trained_model'])
+
+    model_training.execution_options.caching_strategy.max_cache_staleness = "P0D"
+    model_evaluation.execution_options.caching_strategy.max_cache_staleness = "P0D"
 
 
 if __name__ == '__main__':
