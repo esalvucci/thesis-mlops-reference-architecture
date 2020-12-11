@@ -97,7 +97,6 @@ plt.savefig('/tmp/training_set.png')
 _ = df_test["load"].plot(ax=ax, color="tab:orange", ylabel="MW")
 plt.savefig('/tmp/test_set.png')
 
-
 var = df_train.loc[df_train["load"].isna(), :].index
 df_train = add_all_features(df_train).dropna()
 df_test = add_all_features(df_test).dropna()
@@ -109,12 +108,6 @@ y_train = df_train.loc[:, target_col]
 X_test = df_test.drop(columns=target_col)
 y_test = df_test.loc[:, target_col]
 
-print('X train before')
-print(X_train)
-
-print('Y train before')
-print(y_train)
-
 feature_names, prep_pipeline = fit_prep_pipeline(X_train)
 
 X_train_prep = prep_pipeline.transform(X_train)
@@ -122,3 +115,21 @@ X_train_prep = pd.DataFrame(X_train_prep, columns=feature_names, index=df_train.
 
 X_test_prep = prep_pipeline.transform(X_test)
 X_test_prep = pd.DataFrame(X_test_prep, columns=feature_names, index=df_test.index)
+
+X_train_prep.to_csv('/tmp/x_train.csv')
+y_train.to_csv('/tmp/y_train.csv')
+
+X_test_prep.to_csv('/tmp/x_test.csv')
+y_test.to_csv('/tmp/y_test.csv')
+
+print(os.listdir('/tmp/'))
+# Upload the prepared data to gcp bucket
+#bucket_name = 'kubeflow-demo'
+#folder_path = 'forecast-example'
+#client = storage.Client()
+#bucket = client.get_bucket(bucket_name)
+
+#bucket.blob(os.path.join(folder_path, 'x_train.csv')).upload_from_string(X_train_prep.to_csv(), 'text/csv')
+#bucket.blob(os.path.join(folder_path, 'y_train.csv')).upload_from_string(y_train.to_csv(), 'text/csv')
+#bucket.blob(os.path.join(folder_path, 'x_test.csv')).upload_from_string(X_test_prep.to_csv(), 'text/csv')
+#bucket.blob(os.path.join(folder_path, 'y_test.csv')).upload_from_string(y_test.to_csv(), 'text/csv')

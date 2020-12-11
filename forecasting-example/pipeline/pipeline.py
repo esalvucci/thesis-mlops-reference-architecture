@@ -1,6 +1,7 @@
 import kfp
 import os
 import yaml
+from kfp.v2.components import OutputPath
 
 CONFIG_FILENAME = '../config.yaml'
 
@@ -9,32 +10,56 @@ with open(CONFIG_FILENAME) as file:
 
 
 def data_preparation_step():
+    x_training_output_path: OutputPath(str) = '/tmp/x_train.csv'
+    y_training_output_path: OutputPath(str) = '/tmp/y_train.csv'
+    x_test_output_path: OutputPath(str) = '/tmp/x_test.csv'
+    y_test_output_path: OutputPath(str) = '/tmp/y_test.csv'
 
     return kfp.dsl.ContainerOp(
             name='data_preparation',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
                   '/' + configuration_parameters['pipeline']['name'] + '-' + 'data-preparation:latest',
             arguments=[],
-            file_outputs={'training_set': '/tmp/training_set.png',
-                          'test_set': '/tmp/test_set.png'}
+            file_outputs={'x_training_set': x_training_output_path,
+                          'y_training_set': y_training_output_path,
+                          'x_test_set': x_test_output_path,
+                          'y_test_set': y_test_output_path}
     )
 
 
-def model_training_step(input_data):
+def model_training_step(x_training_set, y_training_set, x_test_set, y_test_set):
     return kfp.dsl.ContainerOp(
             name='model training',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
                   '/' + configuration_parameters['pipeline']['name'] + '-' + 'model-training:latest',
-            arguments=['--input_data', kfp.dsl.InputArgumentPath(input_data),
-                       '--output_path', '/tmp/output.txt'],
-            file_outputs={'output': '/tmp/output.txt'}
-    )
+            arguments=['--x_training_set_path', kfp.dsl.InputArgumentPath(x_training_set),
+                       '--y_training_set_path', kfp.dsl.InputArgumentPath(y_training_set),
+                       '--x_test_set_path', kfp.dsl.InputArgumentPath(x_test_set),
+                       '--y_test_set_path', kfp.dsl.InputArgumentPath(y_test_set)],
+            file_outputs={'trained_model': '/tmp/trained_model.pkl'}
+)
+
+
+def model_evaluation_step(x_dataset, y_dataset, model_path):
+    return kfp.dsl.ContainerOp(
+            name='model evaluating',
+            image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
+                  '/' + configuration_parameters['pipeline']['name'] + '-' + 'model-evaluating:latest',
+            arguments=['--x_dataset_path', kfp.dsl.InputArgumentPath(x_dataset),
+                       '--y_dataset_path', kfp.dsl.InputArgumentPath(y_dataset),
+                       '--model_path', kfp.dsl.InputArgumentPath(model_path)],
+            file_outputs={}
+)
 
 
 @kfp.dsl.pipeline(name='Forecasting Example')
 def pipeline():
-    data_preparation_step()
-    # model_training_step(data_preparation.outputs['data_preparation_artifact'])
+    data_preparation = data_preparation_step()
+    model_training = model_training_step(data_preparation.outputs['x_training_set'],
+                        data_preparation.outputs['y_training_set'],
+                        data_preparation.outputs['x_test_set'],
+                        data_preparation.outputs['y_test_set'])
+    #model_evaluation_step(model_training.outputs['model_path'])
 
 
 if __name__ == '__main__':

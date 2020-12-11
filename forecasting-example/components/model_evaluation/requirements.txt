@@ -1,0 +1,5 @@
+sklearn
+pandas
+fire
+pickle
+google-cloud-storage

@@ -1,6 +1,7 @@
 import fire
 import requests
 
+
 def remove_blank_lines(input_dataset_url, output_path):
     
     response = requests.get(input_dataset_url)

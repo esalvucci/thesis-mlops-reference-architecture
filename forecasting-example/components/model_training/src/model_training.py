@@ -1,7 +1,10 @@
 from xgboost import XGBRegressor
+import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
-import sys
+import numpy as np
+import pandas as pd
+import fire
 
 
 def compute_learning_curves(model, X, y, curve_step, verbose=False):
@@ -37,17 +40,30 @@ def compute_learning_curves(model, X, y, curve_step, verbose=False):
     return steps, train_errors, val_errors
 
 
-n_estimators = int(sys.argv[1])
-learning_rate = float(sys.argv[2])
-max_depth = int(sys.argv[3])
-min_child_weight = int(sys.argv[4])
+def train_model(x_training_set_path, y_training_set_path, x_test_set_path, y_test_set_path):
+    n_estimators = 1000
+    learning_rate = 0.5
+    max_depth = 5
 
-model = XGBRegressor(
-        n_estimators=n_estimators, learning_rate=learning_rate, max_depth=max_depth, min_child_weight=5
-)
+    x_training_set = pd.read_csv(x_training_set_path, index_col='time')
+    y_training_set = pd.read_csv(y_training_set_path, index_col='time')
+    x_test_set = pd.read_csv(x_test_set_path, index_col='time')
+    y_test_set = pd.read_csv(y_test_set_path, index_col='time')
 
-model.fit(
-    X_train_prep, y_train, early_stopping_rounds=10,
-    eval_set=[(X_train_prep, y_train), (X_test_prep, y_test)],
-    verbose=False,
-)
+    print(x_training_set.dtypes)
+
+    model = XGBRegressor(
+            n_estimators=n_estimators, learning_rate=learning_rate, max_depth=max_depth, min_child_weight=5
+    )
+
+    model.fit(
+        x_training_set, y_training_set, early_stopping_rounds=10,
+        eval_set=[(x_training_set, y_training_set), (x_test_set, y_test_set)],
+        verbose=False,
+    )
+
+    pickle.dump(model, open('/tmp/trained_model.pkl', 'wb'))
+
+
+if __name__ == "__main__":
+    fire.Fire(train_model)
