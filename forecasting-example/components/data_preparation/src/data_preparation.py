@@ -5,16 +5,15 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import (StandardScaler, OneHotEncoder, FunctionTransformer)
 from sklearn.compose import ColumnTransformer
 import os
+from singleton_logger import SingletonLogger
+
+logger = SingletonLogger.get_logger()
 
 
 def split_train_test(df, split_time):
-    df_train = df.loc[df.index < split_time]
-    print('df train')
-    print(df_train)
-    df_test = df.loc[df.index > split_time]
-    print('df test')
-    print(df_test)
-    return df_train, df_test
+    train_set = df.loc[df.index < split_time]
+    test_set = df.loc[df.index > split_time]
+    return train_set, test_set
 
 
 def add_time_features(df):
@@ -75,7 +74,6 @@ def fit_prep_pipeline(df):
 
 STUDY_START_DATE = pd.Timestamp("2015-01-01 00:00", tz="utc")
 STUDY_END_DATE = pd.Timestamp("2020-01-31 23:00", tz="utc")
-print(os.getcwd())
 dataset_url = os.path.join(os.getcwd(), "datasets/it.csv")
 it_load = pd.read_csv(dataset_url)
 it_load = it_load.drop(columns="end").set_index("start")
@@ -117,12 +115,17 @@ X_test_prep = prep_pipeline.transform(X_test)
 X_test_prep = pd.DataFrame(X_test_prep, columns=feature_names, index=df_test.index)
 
 X_train_prep.to_csv('/tmp/x_train.csv')
+logger.info("X Training set saved")
+
 y_train.to_csv('/tmp/y_train.csv')
+logger.info("Y Training set saved")
 
 X_test_prep.to_csv('/tmp/x_test.csv')
-y_test.to_csv('/tmp/y_test.csv')
+logger.info("X Test set saved")
 
-print(os.listdir('/tmp/'))
+y_test.to_csv('/tmp/y_test.csv')
+logger.info("Y Test set saved")
+
 # Upload the prepared data to gcp bucket
 #bucket_name = 'kubeflow-demo'
 #folder_path = 'forecast-example'

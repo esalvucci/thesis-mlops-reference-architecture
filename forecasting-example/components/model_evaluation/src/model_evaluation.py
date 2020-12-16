@@ -3,7 +3,10 @@ import pandas as pd
 import os
 import fire
 import sklearn.metrics as metrics
-from xgboost import XGBRegressor, Booster
+import pickle
+from singleton_logger import SingletonLogger
+
+logger = SingletonLogger.get_logger()
 
 
 def evaluate_model(dataset_name, model_path):
@@ -23,22 +26,19 @@ def evaluate_model(dataset_name, model_path):
     x_dataset = df.drop(columns='load')
     y_dataset = df.loc[:, 'load']
 
-#    model = pickle.load(open(os.path.join(folder_path, model_path)))
+    try:
+        with open(model_path, 'rb') as model_file:
+            model = pickle.load(open(os.path.join(folder_path, model_path), 'rb'))
+            predictions = model.predict(x_dataset)
 
-    model = XGBRegressor()
-    booster = Booster()
-    booster.load_model(model_path)
-    model._Booster = booster
+            mean_squared_log_error = metrics.mean_squared_log_error(y_dataset, predictions)
+            logger.info("mean_squared_log_error: " + str(mean_squared_log_error))
 
-    predictions = model.predict(x_dataset)
-    print(predictions)
-
-    mean_squared_log_error = metrics.mean_squared_log_error(y_dataset, predictions)
-    print("mean_squared_log_error: " + str(mean_squared_log_error))
-
-    with open('/tmp/mean_squared_log_error.txt', 'w') as output_text:
-        output_text.write(str(mean_squared_log_error))
-
+            with open('/tmp/mean_squared_log_error.txt', 'w') as output_text:
+                output_text.write(str(mean_squared_log_error))
+                logger.info("Metric saved")
+    except FileNotFoundError:
+        logger.info("The file in the specified model path does not exists")
 
 if __name__ == "__main__":
     fire.Fire(evaluate_model)
