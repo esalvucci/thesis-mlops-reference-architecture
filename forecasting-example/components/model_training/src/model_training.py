@@ -1,7 +1,6 @@
 from xgboost import XGBRegressor
 import pandas as pd
 import fire
-import pickle
 
 from singleton_logger import SingletonLogger
 logger = SingletonLogger.get_logger()
@@ -27,9 +26,9 @@ def train_model(x_training_set_path, y_training_set_path, x_test_set_path, y_tes
         verbose=False,
     )
 
-    with open('/tmp/trained_model.pkl', 'wb') as model_file:
-        pickle.dump(model, model_file)
-        logger.info("Model saved")
+    model.save_model('/tmp/trained_model.pkl')
+    logger.info("Model saved")
+
 
 if __name__ == "__main__":
     fire.Fire(train_model)
