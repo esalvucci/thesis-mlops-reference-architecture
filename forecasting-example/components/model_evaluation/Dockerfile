@@ -6,6 +6,6 @@ COPY requirements.txt .
 
 RUN mkdir src && pip3 install -r requirements.txt
 
-COPY src/model_evaluation.py src
+COPY src/*.py src/
 
 ENTRYPOINT ["python3", "src/model_evaluation.py"]

@@ -1,6 +1,6 @@
 #!/bin/bash
 pipeline_name='forecasting-example'
-component_name='model-prediction'
+component_name='data-ingestion'
 docker_container=$DOCKER_CONTAINER_REGISTRY_BASE_URL
 image_name=${docker_container}/${pipeline_name}-${component_name} # Specify the image name here
 image_tag=latest

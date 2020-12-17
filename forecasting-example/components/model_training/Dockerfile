@@ -1,11 +1,11 @@
 FROM python:3.8-slim-buster
 
-WORKDIR /app
+WORKDIR /app/src
 
-COPY requirements.txt .
+COPY requirements.txt ..
 
-RUN mkdir src && pip3 install -r requirements.txt
+RUN pip3 install -r ../requirements.txt
 
-COPY src/model_training.py src
+COPY src/*.py ./
 
-ENTRYPOINT ["python3", "src/model_training.py"]
+ENTRYPOINT ["python3", "model_training.py"]

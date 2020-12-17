@@ -8,4 +8,4 @@ RUN pip3 install -r ../requirements.txt
 
 COPY src/*.py ./
 
-ENTRYPOINT ["python3", "model_prediction.py"]
+ENTRYPOINT ["python3", "data_ingestion.py"]

@@ -1,12 +1,12 @@
 FROM python:3.8-slim-buster
 
-WORKDIR /app
+WORKDIR /app/src
 
-COPY datasets/ datasets/
-COPY requirements.txt .
+COPY datasets/ ../datasets/
+COPY requirements.txt ..
 
-RUN mkdir src && pip3 install -r requirements.txt
+RUN pip3 install -r ../requirements.txt
 
-COPY src/data_preparation.py src
+COPY src/*.py ./
 
-ENTRYPOINT ["python3", "src/data_preparation.py"]
+ENTRYPOINT ["python3", "data_preparation.py"]
