@@ -8,6 +8,7 @@ In the step of data preparation it produces an output which will be passed as in
 [forecast_data_passing](forecasting-example) - This example build a pipeline to make forecast predictions; it shows how
 to store (and retreive data in the next step) through a bucket in Google Cloud Platform. 
 
+
 ## Component folder structure
 According to the [Best Practices for Designing Components](https://www.kubeflow.org/docs/pipelines/sdk/best-practices/) 
 and [Organizing the component files](https://www.kubeflow.org/docs/pipelines/sdk/component-development/#organizing-the-component-files)
