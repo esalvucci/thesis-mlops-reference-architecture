@@ -1,6 +1,5 @@
 steps:
     - name: 'gcr.io/cloud-builders/docker'
-      dir:  'forecasting-example/components/data_ingestion'   # remove-for-manual
       args: [ 'build', '-t', 'gcr.io/x-rain-297912/data_ingestion:latest', '.' ]
 images:
     - 'gcr.io/x-rain-297912/data_ingestion:latest'
