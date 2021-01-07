@@ -1,5 +1,5 @@
 steps:
     - name: 'gcr.io/cloud-builders/docker'
-      args: [ 'build', '-t', 'gcr.io/x-rain-297912/data_ingestion:latest', '.' ]
+      args: [ 'build', '-t', 'gcr.io/x-rain-297912/data_ingestion:latest', 'forecasting-example/components/data_ingestion']
 images:
     - 'gcr.io/x-rain-297912/data_ingestion:latest'
