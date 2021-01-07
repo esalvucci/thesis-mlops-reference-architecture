@@ -25,11 +25,11 @@ def __save_predictions_at(output_path, predictions):
         np.savetxt(output_text, predictions, delimiter=',')
 
 
-def predict(dataset_input_path, output_path, model_path):
+def predict(input_path, output_path, model_path):
     model = __get_model_from(model_path)
 
     try:
-        x = pd.read_csv(dataset_input_path)
+        x = pd.read_csv(input_path)
         x = x.drop(columns="end").set_index("start")
         x = x.dropna()
 

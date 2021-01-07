@@ -1,0 +1,5 @@
+steps:
+    - name: 'gcr.io/cloud-builders/docker'
+      args: [ 'build', '-t', 'gcr.io/x-rain-297912/data_ingestion:latest', 'forecasting-example/components/model_evaluation']
+images:
+    - 'gcr.io/x-rain-297912/model_evaluation:latest'
