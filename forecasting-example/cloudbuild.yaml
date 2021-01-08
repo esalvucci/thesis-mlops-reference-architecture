@@ -1,0 +1,19 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'grc.io/$_PROJECT_ID/$_DATA_INGESTION:$_TAG_NAME', '.']
+    dir: $_COMPONENTS_FOLDER/$_DATA_INGESTION
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'grc.io/$_PROJECT_ID/$_DATA_PREPARATION:$_TAG_NAME', '.']
+    dir: $_COMPONENTS_FOLDER/$_DATA_PREPARATION
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'grc.io/$_PROJECT_ID/$_MODEL_TRAINING:$_TAG_NAME', '.']
+    dir: $_COMPONENTS_FOLDER/$_MODEL_TRAINING
+  - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
+    args:
+      - 'c'
+      - 'dsl-compile --py pipeline.py --output pipeline.tar.gz'
+    dir: $_PIPELINE_FOLDER
+Images:
+  - 'grc.io/$_PROJECT_ID/$_DATA_INGESTION:$_TAG_NAME'
+  - 'grc.io/$_PROJECT_ID/$_DATA_PREPARATION:$_TAG_NAME'
+  - 'grc.io/$_PROJECT_ID/$_MODEL_TRAINING:$_TAG_NAME'
