@@ -83,4 +83,7 @@ def __pipeline(training_dataset_name='it.csv', evaluation_dataset_name='de.csv')
 
 
 if __name__ == '__main__':
+    client = kfp.Client(host=os.environ['HOST'])
     kfp.compiler.Compiler().compile(__pipeline, __file__ + '.yaml')
+    client.pipeline_uploads.upload_pipeline_version(__file__ + '.yaml', pipelineid = os.environ['TAG'],
+                                                    name = 'Forecast Example')
