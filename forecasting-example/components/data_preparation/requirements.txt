@@ -4,4 +4,3 @@ sklearn
 pandas
 matplotlib
 google-cloud-storage
-kubeflow
