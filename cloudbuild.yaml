@@ -1,15 +1,15 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_DATA_INGESTION:$SHORT_SHA', '.']
+    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_DATA_INGESTION:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_DATA_INGESTION
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_DATA_PREPARATION:$SHORT_SHA', '.']
+    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_DATA_PREPARATION:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_DATA_PREPARATION
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_MODEL_TRAINING:$SHORT_SHA', '.']
+    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_MODEL_TRAINING:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_MODEL_TRAINING
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_MODEL_EVALUATION:$SHORT_SHA', '.']
+    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_MODEL_EVALUATION:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_MODEL_EVALUATION
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
     env:
@@ -21,7 +21,7 @@ steps:
     dir: $_PIPELINE_FOLDER
 
 images:
-  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example-data-ingestion:$SHORT_SHA'
-  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example-data-preparation:$SHORT_SHA'
-  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example-model-training:$SHORT_SHA'
-  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example-model-evaluation:$SHORT_SHA'
+  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_DATA_INGESTION:$SHORT_SHA'
+  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_DATA_PREPARATION:$SHORT_SHA'
+  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_MODEL_TRAINING:$SHORT_SHA'
+  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_MODEL_EVALUATION:$SHORT_SHA'
