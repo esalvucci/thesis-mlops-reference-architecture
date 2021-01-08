@@ -13,6 +13,7 @@ steps:
       - 'c'
       - 'dsl-compile --py pipeline.py --output pipeline.tar.gz'
     dir: $_PIPELINE_FOLDER
+    
 Images:
   - 'grc.io/$_PROJECT_ID/$_DATA_INGESTION:$_TAG_NAME'
   - 'grc.io/$_PROJECT_ID/$_DATA_PREPARATION:$_TAG_NAME'
