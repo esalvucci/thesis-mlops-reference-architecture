@@ -18,7 +18,7 @@ steps:
       - 'HOST=$_ENDPOINT'
     args:
       - '-c'
-      - 'dsl-compile --py training_pipeline.py --output training_pipeline.tar.gz'
+      - 'dsl-compile --py pipeline.py --output training_pipeline.tar.gz'
     dir: $_TRAINING_PIPELINE_FOLDER
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
     args:

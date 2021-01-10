@@ -88,6 +88,3 @@ def __pipeline(training_dataset_name='it.csv', evaluation_dataset_name='de.csv')
     model_evaluation.execution_options.caching_strategy.max_cache_staleness = "P0D"
 
 
-if __name__ == '__main__':
-    kfp.compiler.Compiler().compile(__pipeline, __file__ + '.yaml')
-
