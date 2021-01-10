@@ -9,14 +9,15 @@ with open(CONFIG_FILENAME) as file:
     configuration_parameters = yaml.safe_load(file)
 
 
-def __data_ingestion_step(dataset_name):
+def __data_ingestion_step(dataset_name, dataset_path: OutputPath(str)):
 
     return kfp.dsl.ContainerOp(
             name='data_ingestion',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
                   '/' + configuration_parameters['pipeline']['name'] + '-' + 'data-ingestion:' +
                   os.environ['TAG'],
-            arguments=['--dataset_name', dataset_name],
+            arguments=['--file_name', dataset_name,
+                       '--file_path', dataset_path],
             file_outputs={'dataset_path': '/tmp/it.csv'}
     )
 
@@ -40,18 +41,27 @@ def __data_preparation_step(dataset_path):
     )
 
 
-def __model_training_step(x_training_set, y_training_set, x_test_set, y_test_set):
+def __model_training_step(dataset_path):
     return kfp.dsl.ContainerOp(
             name='model training',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
                   '/' + configuration_parameters['pipeline']['name'] + '-' + 'model-training:' +
                   os.environ['TAG'],
-            arguments=['--x_training_set_path', kfp.dsl.InputArgumentPath(x_training_set),
-                       '--y_training_set_path', kfp.dsl.InputArgumentPath(y_training_set),
-                       '--x_test_set_path', kfp.dsl.InputArgumentPath(x_test_set),
-                       '--y_test_set_path', kfp.dsl.InputArgumentPath(y_test_set)],
+            arguments=['--dataset_path', kfp.dsl.InputArgumentPath(dataset_path)],
             file_outputs={'trained_model': '/tmp/trained_model.pkl'}
 )
+
+
+def __data_transformation_step(dataset_path, output_path: OutputPath(str)):
+    return kfp.dsl.ContainerOp(
+            name='data_transformation',
+            image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
+                  '/' + configuration_parameters['pipeline']['name'] + '-' + 'data-transformation:' +
+                  os.environ['TAG'],
+            arguments=['--dataset_path', kfp.dsl.InputArgumentPath(dataset_path),
+                       '--output_path', output_path],
+            file_outputs={'output': output_path}
+    )
 
 
 def __model_evaluation_step(dataset_name, model_path):
@@ -68,22 +78,16 @@ def __model_evaluation_step(dataset_name, model_path):
 
 @kfp.dsl.pipeline(name='Forecasting Example')
 def __pipeline(training_dataset_name='it.csv', evaluation_dataset_name='de.csv'):
-    data_ingestion = __data_ingestion_step(training_dataset_name)
-
-    data_preparation = __data_preparation_step(data_ingestion.outputs['dataset_path'])
-    model_training = __model_training_step(data_preparation.outputs['x_training_set'],
-                                           data_preparation.outputs['y_training_set'],
-                                           data_preparation.outputs['x_test_set'],
-                                           data_preparation.outputs['y_test_set'])
+    dataset_path = '/tmp/it.csv'
+    data_ingestion = __data_ingestion_step(training_dataset_name, dataset_path)
+    data_transformation = __data_transformation_step(data_ingestion.output, dataset_path)
+    model_training = __model_training_step(data_transformation.output)
     model_evaluation = __model_evaluation_step(evaluation_dataset_name, model_training.outputs['trained_model'])
 
-    data_preparation.execution_options.caching_strategy.max_cache_staleness = "P0D"
     model_training.execution_options.caching_strategy.max_cache_staleness = "P0D"
     model_evaluation.execution_options.caching_strategy.max_cache_staleness = "P0D"
 
 
 if __name__ == '__main__':
-    client = kfp.Client(host=os.environ['HOST'])
     kfp.compiler.Compiler().compile(__pipeline, __file__ + '.yaml')
-    client.pipeline_uploads.upload_pipeline_version(__file__ + '.yaml', pipelineid = os.environ['TAG'],
-                                                    name = 'Forecast Example')
+

@@ -18,13 +18,13 @@ steps:
       - 'HOST=$_ENDPOINT'
     args:
       - '-c'
-      - 'dsl-compile --py pipeline.py --output pipeline.tar.gz'
-    dir: $_PIPELINE_FOLDER
+      - 'dsl-compile --py training_pipeline.py --output training_pipeline.tar.gz'
+    dir: $_TRAINING_PIPELINE_FOLDER
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
     args:
       - '-c'
-      - 'kfp --endpoint $_ENDPOINT pipeline upload -p ${_PIPELINE_NAME} pipeline.tar.gz'
-    dir: $_PIPELINE_FOLDER
+      - 'kfp --endpoint $_ENDPOINT pipeline upload -p ${_TRAINING_PIPELINE_NAME} training_pipeline.tar.gz'
+    dir: $_TRAINING_PIPELINE_FOLDER
 
 images:
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_DATA_INGESTION:$SHORT_SHA'

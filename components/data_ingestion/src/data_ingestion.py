@@ -6,13 +6,12 @@ from singleton_logger import SingletonLogger
 logger = SingletonLogger.get_logger()
 
 
-def __get_data(dataset_name):
+def __get_data(file_name, file_path):
     bucket_name = 'kubeflow-demo'
     folder_path = 'forecast-example'
-    dataset_path = os.path.join('/tmp/', dataset_name)
     client = storage.Client()
     bucket = client.get_bucket(bucket_name)
-    bucket.blob(os.path.join(folder_path, dataset_name)).download_to_filename(dataset_path)
+    bucket.blob(os.path.join(folder_path, file_name)).download_to_filename(file_path)
 
 
 if __name__ == "__main__":
