@@ -6,6 +6,9 @@ steps:
     args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_PREPARATION:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_DATA_PREPARATION
   - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_TRANSFORMATION:$SHORT_SHA', '.']
+    dir: $_COMPONENTS_FOLDER/$_DATA_TRANSFORMATION
+  - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_MODEL_TRAINING:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_MODEL_TRAINING
   - name: 'gcr.io/cloud-builders/docker'
@@ -49,5 +52,6 @@ steps:
 images:
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_DATA_INGESTION:$SHORT_SHA'
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_DATA_PREPARATION:$SHORT_SHA'
+  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_DATA_TRANSFORMATION:$SHORT_SHA'
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_MODEL_TRAINING:$SHORT_SHA'
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_MODEL_EVALUATION:$SHORT_SHA'
