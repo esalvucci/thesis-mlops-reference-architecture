@@ -9,7 +9,7 @@ def __data_ingestion_step(dataset_name, dataset_path: OutputPath(str)):
     return kfp.dsl.ContainerOp(
             name='data_ingestion',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
-                  '/' + os.environ['PROJECT_NAME'] + '/' + 'data-ingestion:' +
+                  '/' + os.environ['PROJECT_NAME'] + '/' + os.environ['DATA_INGESTION'] + ':' +
                   os.environ['TAG'],
             arguments=['--file_name', dataset_name,
                        '--file_path', dataset_path],
@@ -26,7 +26,7 @@ def __data_preparation_step(dataset_path):
     return kfp.dsl.ContainerOp(
             name='data_preparation',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
-                  '/' + os.environ['PROJECT_NAME'] + '/' + 'data-preparation:' +
+                  '/' + os.environ['PROJECT_NAME'] + '/' + os.environ['DATA_PREPARATION'] + ':' +
                   os.environ['TAG'],
             arguments=['--dataset_path', kfp.dsl.InputArgumentPath(dataset_path)],
             file_outputs={'x_training_set': x_training_output_path,
@@ -40,7 +40,7 @@ def __model_training_step(dataset_path):
     return kfp.dsl.ContainerOp(
             name='model training',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
-                  '/' + os.environ['PROJECT_NAME'] + '/' + 'model-training:' +
+                  '/' + os.environ['PROJECT_NAME'] + '/' + os.environ['MODEL_TRAINING'] + ':' +
                   os.environ['TAG'],
             arguments=['--dataset_path', kfp.dsl.InputArgumentPath(dataset_path)],
             file_outputs={'trained_model': '/tmp/trained_model.pkl'}
@@ -51,7 +51,7 @@ def __data_transformation_step(dataset_path, output_path: OutputPath(str)):
     return kfp.dsl.ContainerOp(
             name='data_transformation',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
-                  '/' + os.environ['PROJECT_NAME'] + '/' + 'data-transformation:' +
+                  '/' + os.environ['PROJECT_NAME'] + '/' + os.environ['DATA_TRANSFORMATION'] + ':' +
                   os.environ['TAG'],
             arguments=['--dataset_path', kfp.dsl.InputArgumentPath(dataset_path),
                        '--output_path', output_path],
@@ -63,7 +63,7 @@ def __model_evaluation_step(dataset_name, model_path):
     return kfp.dsl.ContainerOp(
             name='model evaluation',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
-                  '/' + os.environ['PROJECT_NAME'] + '/' + 'model-evaluation:' +
+                  '/' + os.environ['PROJECT_NAME'] + '/' + os.environ['MODEL_EVALUATION'] + ':' +
                   os.environ['TAG'],
             arguments=['--dataset_name', dataset_name,
                        '--model_path', kfp.dsl.InputArgumentPath(model_path)],

@@ -17,6 +17,10 @@ steps:
       - 'TAG=$SHORT_SHA'
       - 'HOST=$_ENDPOINT'
       - 'PROJECT_NAME=$_PROJECT_NAME'
+      - 'DATA_INGESTION=$_DATA_INGESTION'
+      - 'DATA_PREPARATION=$_DATA_PREPARATION'
+      - 'MODEL_TRAINING=$_MODEL_TRAINING'
+      - 'MODEL_EVALUATION=$_MODEL_EVALUATION'
     args:
       - '-c'
       # The pipeline (name) must exist here
