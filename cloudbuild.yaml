@@ -28,7 +28,11 @@ steps:
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
     args:
       - '-c'
-      - 'kfp --endpoint $_ENDPOINT run submit -e "${_PIPELINE_NAME}" -r ${SHORT_SHA} -p ${SHORT_SHA}'
+      - 'kfp --endpoint $_ENDPOINT run submit
+              -e "${_PIPELINE_NAME}"
+              -r ${SHORT_SHA}
+              -p $(kfp --endpoint $_ENDPOINT pipeline list | grep -w "${_PIPELINE_NAME}"  |
+                   grep -E -o -e "([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}")'
     dir: $_PIPELINE_FOLDER
 
 
