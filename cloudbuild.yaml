@@ -23,7 +23,7 @@ steps:
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
     args:
       - '-c'
-      - 'kfp --endpoint $_ENDPOINT pipeline upload -p ${_TRAINING_PIPELINE_NAME} training_pipeline.tar.gz'
+      - 'kfp --endpoint $_ENDPOINT pipeline upload -p "${_TRAINING_PIPELINE_NAME}" training_pipeline.tar.gz'
     dir: $_TRAINING_PIPELINE_FOLDER
 
 images:

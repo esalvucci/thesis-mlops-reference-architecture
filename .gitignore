@@ -1,5 +1,4 @@
-simple_data_passing/src/data_preparation_component/link_dataset
 **/__pycache__/
-*.tar.gz/
+**/*.tar.gz
 *.log
 .idea

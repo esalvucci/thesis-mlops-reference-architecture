@@ -20,6 +20,13 @@ def __get_model_from(model_path):
         logger.info("The file in the specified model path does not exists")
 
 
+def __split_data_into_x_y(data):
+    target_col = "index"
+    x = data.drop(columns=target_col)
+    y = data.loc[:, target_col]
+    return x, y
+
+
 def __save_predictions_at(output_path, predictions):
     with open(output_path, 'wb') as output_text:
         np.savetxt(output_text, predictions, delimiter=',')
@@ -29,12 +36,10 @@ def predict(input_path, output_path, model_path):
     model = __get_model_from(model_path)
 
     try:
-        x = pd.read_csv(input_path)
-        x = x.drop(columns="end").set_index("start")
-        x = x.dropna()
+        df = pd.read_csv(input_path)
+        df = df.dropna()
 
-        x.index = pd.to_datetime(x.index, errors='coerce')
-        x.index.name = "time"
+        x, y = __split_data_into_x_y(df)
 
         predictions = model.predict(x)
         __save_predictions_at(output_path, predictions)

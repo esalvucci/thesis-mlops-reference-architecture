@@ -41,22 +41,35 @@ def __data_transformation_step(dataset_path, output_path: OutputPath(str)):
     )
 
 
+def __prediction_step(dataset_path, output_path: OutputPath(str), model_path):
+    return kfp.dsl.ContainerOp(
+            name='prediction',
+            image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
+                  '/' + configuration_parameters['pipeline']['name'] + '-' + 'model-prediction:' +
+                  os.environ['TAG'],
+            arguments=['--dataset_path', kfp.dsl.InputArgumentPath(dataset_path),
+                       '--output_path', output_path,
+                       '--model_path', kfp.dsl.InputArgumentPath(model_path)],
+            file_outputs={'output': output_path}
+    )
+
+
 @kfp.dsl.pipeline(name='Forecasting Example')
 def __pipeline(prediction_dataset_name='de.csv', model_name='trained_model.pkl'):
-    prediction_path = '/tmp/de.csv'
+    prediction_dataset_path = '/tmp/de.csv'
+    prediction_output_path = '/tmp/de_predictions.csv'
     model_path = '/tmp/trained_model.pkl'
-    data_ingestion = __data_ingestion_step(prediction_dataset_name, prediction_path)
-    data_transformation = __data_transformation_step(data_ingestion.output, prediction_path)
-    drop_header = drop_header_op(data_transformation.output)
+    data_ingestion = __data_ingestion_step(prediction_dataset_name, prediction_dataset_path)
+    #data_transformation = __data_transformation_step(data_ingestion.output, prediction_dataset_path)
+    drop_header = drop_header_op(data_ingestion.output)
     model_file = __data_ingestion_step(model_name, model_path)
 
-    predictions = xgboost_predict_on_csv_op(data=drop_header.output,
-                                            model=model_file.output,
-                                            label_column=1)
+    predictions = __prediction_step(prediction_dataset_path, prediction_output_path, model_path)
 
     predictions.after(drop_header, model_file)
     data_ingestion.execution_options.caching_strategy.max_cache_staleness = "P0D"
     model_file.execution_options.caching_strategy.max_cache_staleness = "P0D"
+    predictions.execution_options.caching_strategy.max_cache_staleness = "P0D"
 
 
 if __name__ == '__main__':
