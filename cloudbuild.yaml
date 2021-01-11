@@ -18,13 +18,17 @@ steps:
       - 'HOST=$_ENDPOINT'
     args:
       - '-c'
+      # The pipeline (name) must exist here
       - 'dsl-compile --py pipeline.py --output training_pipeline.tar.gz &&
-        kfp --endpoint $ENDPOINT upload-version -p "${_TRAINING_PIPELINE_NAME}" -v ${SHORT_SHA} training_pipeline.tar.gz'
+        export PIPELINE_ID=$(kfp --endpoint $_ENDPOINT pipeline list |
+          grep -w "${_TRAINING_PIPELINE_NAME}"  |
+          grep -E -o -e "([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}") &&
+        kfp --endpoint $_ENDPOINT pipeline upload-version -p $PIPELINE_ID -v ${SHORT_SHA} training_pipeline.tar.gz'
     dir: $_TRAINING_PIPELINE_FOLDER
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
     args:
       - '-c'
-      - 'kfp --endpoint $ENDPOINT run submit -e $_EXPERIMENT_NAME -r ${SHORT_SHA} -p ${SHORT_SHA}'
+      - 'kfp --endpoint $_ENDPOINT run submit -e $_EXPERIMENT_NAME -r ${SHORT_SHA} -p ${SHORT_SHA}'
     dir: $_TRAINING_PIPELINE_FOLDER
 
 images:
