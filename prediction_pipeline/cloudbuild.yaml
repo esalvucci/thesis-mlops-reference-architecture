@@ -20,8 +20,12 @@ steps:
         kfp --endpoint $_ENDPOINT pipeline upload-version -p
           $(kfp --endpoint $_ENDPOINT pipeline list | grep -w "${_PIPELINE_NAME}"  |
             grep -E -o -e "([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}")
-        -v ${SHORT_SHA} prediction_pipeline.tar.gz &&
-        kfp --endpoint $_ENDPOINT run submit -e "${_PIPELINE_NAME}" -r ${SHORT_SHA} -p ${SHORT_SHA}'
+        -v ${SHORT_SHA} prediction_pipeline.tar.gz'
+    dir: $_PIPELINE_FOLDER
+  - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
+    args:
+      - '-c'
+      - 'kfp --endpoint $_ENDPOINT run submit -e "${_PIPELINE_NAME}" -r ${SHORT_SHA} -p ${SHORT_SHA}'
     dir: $_PIPELINE_FOLDER
 
 images:
