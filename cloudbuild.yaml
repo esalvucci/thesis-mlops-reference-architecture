@@ -1,15 +1,15 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_DATA_INGESTION:$SHORT_SHA', '.']
+    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_INGESTION:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_DATA_INGESTION
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_DATA_PREPARATION:$SHORT_SHA', '.']
+    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_PREPARATION:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_DATA_PREPARATION
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_MODEL_TRAINING:$SHORT_SHA', '.']
+    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_MODEL_TRAINING:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_MODEL_TRAINING
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/forecasting_example/$_MODEL_EVALUATION:$SHORT_SHA', '.']
+    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_MODEL_EVALUATION:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_MODEL_EVALUATION
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
     env:
@@ -19,16 +19,21 @@ steps:
       - 'PROJECT_NAME=$_PROJECT_NAME'
       - 'DATA_INGESTION=$_DATA_INGESTION'
       - 'DATA_PREPARATION=$_DATA_PREPARATION'
+      - 'DATA_TRANSFORMATION=$_DATA_TRANSFORMATION'
       - 'MODEL_TRAINING=$_MODEL_TRAINING'
       - 'MODEL_EVALUATION=$_MODEL_EVALUATION'
     args:
       - '-c'
       # The pipeline (name) must exist here
-      - 'dsl-compile --py pipeline.py --output training_pipeline.tar.gz &&
-        kfp --endpoint $_ENDPOINT pipeline upload-version -p
-          $(kfp --endpoint $_ENDPOINT pipeline list | grep -w "${_PIPELINE_NAME}"  |
-            grep -E -o -e "([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}")
-        -v ${SHORT_SHA} training_pipeline.tar.gz'
+      - 'dsl-compile --py pipeline.py --output training_pipeline.tar.gz'
+    dir: $_PIPELINE_FOLDER
+  - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
+    args:
+      - '-c'
+      - 'kfp --endpoint $_ENDPOINT pipeline upload-version -p
+           $(kfp --endpoint $_ENDPOINT pipeline list | grep -w "${_PIPELINE_NAME}"  |
+             grep -E -o -e "([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}")
+         -v ${SHORT_SHA} training_pipeline.tar.gz'
     dir: $_PIPELINE_FOLDER
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
     args:

@@ -16,7 +16,7 @@ steps:
       - 'PROJECT_NAME=$_PROJECT_NAME'
       - 'DATA_INGESTION=$_DATA_INGESTION'
       - 'DATA_TRANSFORMATION=$_DATA_TRANSFORMATION'
-      - 'MODEL_PREDICTION=$_MODEL_PREDICTION'
+      - '$_MODEL_PREDICTION=$_MODEL_PREDICTION'
     args:
       - '-c'
       # The pipeline (name) must exist here
