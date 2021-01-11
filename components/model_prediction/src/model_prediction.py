@@ -1,6 +1,5 @@
 import fire
 import pandas as pd
-import pickle
 import numpy as np
 from xgboost import XGBRegressor, Booster
 
@@ -21,9 +20,9 @@ def __get_model_from(model_path):
 
 
 def __split_data_into_x_y(data):
-    target_col = "index"
-    x = data.drop(columns=target_col)
-    y = data.loc[:, target_col]
+    target_col = 0
+    x = data.drop(columns=data.columns[target_col], axis=1)
+    y = data.loc[:, data.columns[target_col]]
     return x, y
 
 
@@ -32,11 +31,11 @@ def __save_predictions_at(output_path, predictions):
         np.savetxt(output_text, predictions, delimiter=',')
 
 
-def predict(input_path, output_path, model_path):
+def predict(dataset_path, output_path, model_path):
     model = __get_model_from(model_path)
 
     try:
-        df = pd.read_csv(input_path)
+        df = pd.read_csv(dataset_path)
         df = df.dropna()
 
         x, y = __split_data_into_x_y(df)

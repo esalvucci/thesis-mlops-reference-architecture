@@ -57,16 +57,15 @@ def __prediction_step(dataset_path, output_path: OutputPath(str), model_path):
 @kfp.dsl.pipeline(name='Forecasting Example')
 def __pipeline(prediction_dataset_name='de.csv', model_name='trained_model.pkl'):
     prediction_dataset_path = '/tmp/de.csv'
-    prediction_output_path = '/tmp/de_predictions.csv'
+    prediction_output_path = '/tmp/de_predictions.txt'
     model_path = '/tmp/trained_model.pkl'
     data_ingestion = __data_ingestion_step(prediction_dataset_name, prediction_dataset_path)
-    #data_transformation = __data_transformation_step(data_ingestion.output, prediction_dataset_path)
-    drop_header = drop_header_op(data_ingestion.output)
+    data_transformation = __data_transformation_step(data_ingestion.output, prediction_dataset_path)
+    drop_header = drop_header_op(data_transformation.output)
     model_file = __data_ingestion_step(model_name, model_path)
 
-    predictions = __prediction_step(prediction_dataset_path, prediction_output_path, model_path)
+    predictions = __prediction_step(drop_header.output, prediction_output_path, model_file.output)
 
-    predictions.after(drop_header, model_file)
     data_ingestion.execution_options.caching_strategy.max_cache_staleness = "P0D"
     model_file.execution_options.caching_strategy.max_cache_staleness = "P0D"
     predictions.execution_options.caching_strategy.max_cache_staleness = "P0D"
