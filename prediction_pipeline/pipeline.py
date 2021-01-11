@@ -11,17 +11,12 @@ drop_header_op = components.load_component_from_url('https://raw.githubuserconte
                                                     'pipelines/02c9638287468c849632cf9f7885b51de4c66f86/'
                                                     'components/tables/Remove_header/component.yaml')
 
-CONFIG_FILENAME = '../config.yaml'
-
-with open(CONFIG_FILENAME) as file:
-    configuration_parameters = yaml.safe_load(file)
-
 
 def __data_ingestion_step(file_name: str, output_path: OutputPath(str)):
     return kfp.dsl.ContainerOp(
             name='data_ingestion',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
-                  '/' + configuration_parameters['pipeline']['name'] + '/' + 'data-ingestion:' +
+                  '/' + os.environ['PROJECT_NAME'] + '/' + 'data-ingestion:' +
                   os.environ['TAG'],
             arguments=['--file_name', file_name,
                        '--file_path', output_path],
@@ -33,7 +28,7 @@ def __data_transformation_step(dataset_path, output_path: OutputPath(str)):
     return kfp.dsl.ContainerOp(
             name='data_transformation',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
-                  '/' + configuration_parameters['pipeline']['name'] + '/' + 'data-transformation:' +
+                  '/' + os.environ['PROJECT_NAME'] + '/' + 'data-transformation:' +
                   os.environ['TAG'],
             arguments=['--dataset_path', kfp.dsl.InputArgumentPath(dataset_path),
                        '--output_path', output_path],
@@ -45,7 +40,7 @@ def __prediction_step(dataset_path, output_path: OutputPath(str), model_path):
     return kfp.dsl.ContainerOp(
             name='prediction',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
-                  '/' + configuration_parameters['pipeline']['name'] + '/' + 'model-prediction:' +
+                  '/' + os.environ['PROJECT_NAME'] + '/' + 'model-prediction:' +
                   os.environ['TAG'],
             arguments=['--dataset_path', kfp.dsl.InputArgumentPath(dataset_path),
                        '--output_path', output_path,

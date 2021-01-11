@@ -16,6 +16,7 @@ steps:
       - 'DOCKER_CONTAINER_REGISTRY_BASE_URL=$_DOCKER_CONTAINER_REGISTRY_BASE_URL'
       - 'TAG=$SHORT_SHA'
       - 'HOST=$_ENDPOINT'
+      - 'PROJECT_NAME=$_PROJECT_NAME'
     args:
       - '-c'
       # The pipeline (name) must exist here
