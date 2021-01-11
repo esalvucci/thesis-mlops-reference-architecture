@@ -9,7 +9,7 @@ def __data_ingestion_step(dataset_name, dataset_path: OutputPath(str)):
     return kfp.dsl.ContainerOp(
             name='data_ingestion',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
-                  '/' + os.environ['PIPELINE_NAME'] + '/' + 'data-ingestion:' +
+                  '/' + os.environ['PROJECT_NAME'] + '/' + 'data-ingestion:' +
                   os.environ['TAG'],
             arguments=['--file_name', dataset_name,
                        '--file_path', dataset_path],
