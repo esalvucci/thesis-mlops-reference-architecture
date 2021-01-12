@@ -1,20 +1,34 @@
 steps:
+  # Build the component of the Kubeflow Pipeline
+  # The name is the URI of the corresponding cloud builder container
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_INGESTION:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_DATA_INGESTION
+
+  # Build the component of the Kubeflow Pipeline
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_PREPARATION:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_DATA_PREPARATION
+
+  # Build the component of the Kubeflow Pipeline
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_TRANSFORMATION:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_DATA_TRANSFORMATION
+
+  # Build the component of the Kubeflow Pipeline
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_MODEL_TRAINING:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_MODEL_TRAINING
+
+  # Build the component of the Kubeflow Pipeline
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_MODEL_EVALUATION:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_MODEL_EVALUATION
+
+  # Through the kfp-cli compile the pipeline
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
+    # The 'env' property allows to pass the container environment variables
+    # (which values are specified in the trigger settings)
     env:
       - 'DOCKER_CONTAINER_REGISTRY_BASE_URL=$_DOCKER_CONTAINER_REGISTRY_BASE_URL'
       - 'TAG=$SHORT_SHA'
@@ -27,20 +41,32 @@ steps:
       - 'MODEL_EVALUATION=$_MODEL_EVALUATION'
     args:
       - '-c'
-      # The pipeline (name) must exist here
+
+      # dsl-compile --py <PYHTON_FILE_NAME> --output <COMPILED_PIPELINE_FILENAME>
       - 'dsl-compile --py pipeline.py --output training_pipeline.tar.gz'
     dir: $_PIPELINE_FOLDER
+
+  # Through the kfp-cli upload a new version of it to the Kubeflow Pipeline specified endpoint.
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
     args:
       - '-c'
+
+      # kfp --endpoint <ENDPOINT_URI> pipeline upload-version -p <PIPELINE_ID> -v <VERSION_ID> <COMPILED_PIPELINE_FILENAME>
+      # Note that ++ the pipeline must exist here ++. If the pipeline does not exists an exception will be thrown.
+      # To get the PIPELINE_ID dinamically run the command inside the $() as -p argument
       - 'kfp --endpoint $_ENDPOINT pipeline upload-version -p
            $(kfp --endpoint $_ENDPOINT pipeline list | grep -w "${_PIPELINE_NAME}"  |
              grep -E -o -e "([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}")
          -v ${SHORT_SHA} training_pipeline.tar.gz'
     dir: $_PIPELINE_FOLDER
+
+  # Through the kfp-cli trigger the new pipeline verison run.
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
     args:
       - '-c'
+
+      # kfp --endpoint <ENDPOINT_URI> run submit -e <EXPERIMENT_NAME> -r <RUN_ID> -p <PIPELINE_ID>
+      # To get the PIPELINE_ID dinamically run the command inside the $() as -p argument
       - 'kfp --endpoint $_ENDPOINT run submit
               -e "${_PIPELINE_NAME}"
               -r ${SHORT_SHA}
@@ -48,7 +74,9 @@ steps:
                    grep -E -o -e "([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}")'
     dir: $_PIPELINE_FOLDER
 
-
+# In the args property we build the image locally. We also need to push the built image to a docker container registry.
+# This operation is specified in the 'images' property.
+# Note the lowercase name ('images')
 images:
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_INGESTION:$SHORT_SHA'
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_PREPARATION:$SHORT_SHA'
