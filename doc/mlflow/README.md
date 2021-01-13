@@ -14,7 +14,7 @@
 
         - Create a VM Instance
         
-        ![Create Instance](res/ce_vm_create_instance.png)
+        ![Create Instance](/doc/images/ce_vm_create_instance.png)
         
         * Machine configuration:
             For a demo purpose it could be enough an "E2-micro" machine
@@ -29,7 +29,7 @@
     
     * SSH your VM from the console and install mlflow and google cloud storage
     
-    ![Open SSH](res/ce_vm_instance_ssh.png)
+    ![Open SSH](/doc/images/ce_vm_instance_ssh.png)
     
     - Install pip3, mlflow and Google Cloud Storage
         ```
@@ -83,7 +83,7 @@
             ```
 
     * Create Cloud Storage Bucket
-        ![Open SSH](res/storage_menu.png)
+        ![Open SSH](/doc/images/storage_menu.png)
     
         On the left menu go to Storage and select "Create Bucket".
         
@@ -93,7 +93,7 @@
     * Launch MLFlow Server
 
     * Note down your instance's internal and external IP
-    ![Open SSH](res/instance_ips.png)
+    ![Open SSH](/doc/images/instance_ips.png)
 
     * Run mlflow server
     ```
