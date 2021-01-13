@@ -34,7 +34,7 @@
     - Install pip3, mlflow and Google Cloud Storage
         ```
         sudo apt update
-        sudo upgrade
+        sudo apt upgrade
         # Install pip
         sudo apt install -y python3-pip
         python3 -m pip install -U six

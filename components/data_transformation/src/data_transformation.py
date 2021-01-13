@@ -8,6 +8,7 @@ logger = SingletonLogger.get_logger()
 def __transform_data(dataset_path, output_path):
     df = pd.read_csv(dataset_path)
     df = df.drop(columns="end").drop(columns="start")
+    df.dropna(inplace=True)
     df.index.name = 'index'
     df.to_csv(output_path)
     logger.info("Dataset saved in " + output_path)

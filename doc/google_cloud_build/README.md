@@ -32,7 +32,7 @@ The Cloud Build yaml describes how the cloud build to be run and what arguments 
 command (defined in the corresponding Dockerfile).
 
 In the two cloud build configuration files are used docker standard cloud builders (gcr.io/cloud-builders/docker)
-and a custom Cloud Build builder (gcr.io/$_PROJECT_ID/kfp-cli) which Docker file is in the [components](/components/kfp-cli)
+and a custom Cloud Build builder (gcr.io/$_PROJECT_ID/kfp-cli) which Docker file is in the [components](/components/utility/kfp-cli)
 directory.
 
 #### Steps

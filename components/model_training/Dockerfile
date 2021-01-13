@@ -1,11 +1,13 @@
 FROM python:3.8-slim-buster
 
-WORKDIR /app/src
+WORKDIR /app/
 
 COPY requirements.txt ..
 
 RUN pip3 install -r ../requirements.txt
+RUN mkdir src
 
-COPY src/*.py ./
+COPY src/*.py src
+COPY MLProject .
 
-ENTRYPOINT ["python3", "model_training.py"]
+ENTRYPOINT ["mlflow", "run"]

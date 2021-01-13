@@ -42,7 +42,7 @@ def __model_training_step(dataset_path):
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
                   '/' + os.environ['PROJECT_NAME'] + '/' + os.environ['MODEL_TRAINING'] + ':' +
                   os.environ['TAG'],
-            arguments=['--dataset_path', kfp.dsl.InputArgumentPath(dataset_path)],
+            arguments=['-P', kfp.dsl.InputArgumentPath(dataset_path)],
             file_outputs={'trained_model': '/tmp/trained_model.pkl'}
 )
 
