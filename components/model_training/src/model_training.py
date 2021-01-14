@@ -18,8 +18,14 @@ def __save(model, model_name="XGB regressor"):
     logger.info("Model saved")
 
 
-def __log_metrics(name, cv_score):
-    mlflow.log_metric(name, cv_score.mean())
+def __log_parameter(name, parameter_value):
+    logger.info(name + ": " + str(parameter_value))
+    mlflow.log_param(name, parameter_value)
+
+
+def __log_metric(name, metric_value):
+    logger.info(name + ": " + str(metric_value))
+    mlflow.log_metric(name, metric_value)
 
 
 def __save_test_set_to_file(x_test_set, y_test_set):
@@ -31,6 +37,7 @@ def __split_data_into_x_y(data):
     target_col = "index"
     x = data.drop(columns=target_col)
     y = data.loc[:, target_col]
+    logger.info("Data splitted into x and y")
     return x, y
 
 
@@ -57,10 +64,10 @@ def train_model(dataset_path, n_estimators, learning_rate, max_depth, min_child_
 
     with mlflow.start_run(experiment_id=experiment.experiment_id):
         mlflow.set_experiment(experiment_name=model_name)
-        mlflow.log_param("N estimators", n_estimators)
-        mlflow.log_param("Learinging Rate", learning_rate)
-        mlflow.log_param("Max Depth", max_depth)
-        mlflow.log_param("Min child weight", min_child_weight)
+        __log_parameter("N estimators", n_estimators)
+        __log_parameter("Learinging Rate", learning_rate)
+        __log_parameter("Max Depth", max_depth)
+        __log_parameter("Min child weight", min_child_weight)
 
         model = XGBRegressor(
             n_estimators=n_estimators,
@@ -68,19 +75,20 @@ def train_model(dataset_path, n_estimators, learning_rate, max_depth, min_child_
             max_depth=max_depth,
             min_child_weight=min_child_weight
         )
-
+        logger.info("Training Started")
         model.fit(
             x_training_set, y_training_set, early_stopping_rounds=10,
             eval_set=[(x_training_set, y_training_set), (x_test_set, y_test_set)],
             verbose=True,
         )
 
+        logger.info("Cross Validation Started")
         cv_scores = cross_val_score(model, x_training_set, y_training_set, cv=10)
 
         y_test_pred = model.predict(x_test_set)
         rmse = np.sqrt(mean_squared_error(y_test_pred, y_test_set))
-        __log_metrics("Mean CV score", cv_scores.mean())
-        __log_metrics("rmse", rmse)
+        __log_metric("Mean CV score", cv_scores.mean())
+        __log_metric("rmse", rmse)
 
         __save(model, model_name)
         __promote(model_name)
