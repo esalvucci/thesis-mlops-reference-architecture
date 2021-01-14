@@ -18,5 +18,7 @@ Use the following links to read the detailed documentation about how each techno
 * [Kubeflow](doc/kubeflow) - Used to orchestrate the ML workflow
 * [Google Cloud Build](doc/kubeflow) - Used to build a CI pipeline 
 
+![Project Architecture](/doc/images/architecture.png)
+
 ## Licence
 This project is licensed under the GPLv3 Licence - see the [LICENSE](LICENSE) file for details
