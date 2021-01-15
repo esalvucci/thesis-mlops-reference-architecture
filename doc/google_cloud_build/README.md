@@ -70,6 +70,9 @@ according to a specific run.
   
 * Once the trigger is properly configured you can run it manually ("Run", in the "Triggers" page of the left menu)
 or automatically while the selected event occurs.
+
+Before running the trigger make sure your "pipeline" (the specified pipeline name) exists on your Kubeflow instance
+(as the Experiment itself). [See this Closed Issue](https://github.com/esalvucci/mlops-architecture-example/issues/2#issue-786744338)
   
 #### Substitutions Mechanism <a name = "substitutions"></a>
 Substitutions, in Cloud Build, is a powerful mechanism: Cloud Build allows you to substitute variables before each of
