@@ -11,10 +11,11 @@ import mlflow.xgboost
 from mlflow.tracking import MlflowClient
 
 logger = SingletonLogger.get_logger()
+model_name = "xgb_regressor"
 
 
-def __save(model, model_name="XGB regressor"):
-    mlflow.xgboost.log_model(model, artifact_path="XGB_regressor_model", registered_model_name=model_name)
+def __save(model, name):
+    mlflow.xgboost.log_model(model, artifact_path="XGB_regressor_model", registered_model_name=name)
     logger.info("Model saved")
 
 
@@ -41,33 +42,32 @@ def __split_data_into_x_y(data):
     return x, y
 
 
-def __get_mlflow_experiment():
-    experiment_name = "Forecast Example - Training"
-    if not mlflow.get_experiment_by_name(experiment_name):
-        mlflow.create_experiment(name=experiment_name)
-    return mlflow.get_experiment_by_name(experiment_name)
+def __get_mlflow_experiment(name):
+    if not mlflow.get_experiment_by_name(name):
+        mlflow.create_experiment(name=name)
+    return mlflow.get_experiment_by_name(name)
 
 
-def __promote(model_name):
+def __promote(name):
     client = MlflowClient()
-    client.transition_model_version_stage(model_name, version=2, stage=STAGE_PRODUCTION)
+    client.transition_model_version_stage(name, version=2, stage=STAGE_PRODUCTION)
 
 
-def train_model(dataset_path, n_estimators, learning_rate, max_depth, min_child_weight):
-    model_name = "XGB regressor"
+def train_model(dataset_path, n_estimators, learning_rate, max_depth, min_child_weight, version):
     dataset = pd.read_csv(dataset_path)
-    train_set, test_set = train_test_split(dataset, test_size=0.33)
+    test_set_size = 0.33
+    train_set, test_set = train_test_split(dataset, test_size=test_set_size)
     x_training_set, y_training_set = __split_data_into_x_y(train_set)
     x_test_set, y_test_set = __split_data_into_x_y(test_set)
 
-    experiment = __get_mlflow_experiment()
+    experiment = __get_mlflow_experiment(model_name)
 
-    with mlflow.start_run(experiment_id=experiment.experiment_id):
-        mlflow.set_experiment(experiment_name=model_name)
+    with mlflow.start_run(experiment_id=experiment.experiment_id, run_name=version):
         __log_parameter("N estimators", n_estimators)
-        __log_parameter("Learinging Rate", learning_rate)
+        __log_parameter("Learning Rate", learning_rate)
         __log_parameter("Max Depth", max_depth)
         __log_parameter("Min child weight", min_child_weight)
+        __log_parameter("Test set size", test_set_size)
 
         model = XGBRegressor(
             n_estimators=n_estimators,
@@ -91,7 +91,8 @@ def train_model(dataset_path, n_estimators, learning_rate, max_depth, min_child_
         __log_metric("rmse", rmse)
 
         __save(model, model_name)
-        __promote(model_name)
+
+#        __promote(model_name)
 
 
 if __name__ == "__main__":

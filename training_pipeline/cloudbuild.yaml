@@ -7,17 +7,14 @@ steps:
 
   # Build the component of the Kubeflow Pipeline
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_PREPARATION:$SHORT_SHA', '.']
-    dir: $_COMPONENTS_FOLDER/$_DATA_PREPARATION
-
-  # Build the component of the Kubeflow Pipeline
-  - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_TRANSFORMATION:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_DATA_TRANSFORMATION
 
   # Build the component of the Kubeflow Pipeline
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_MODEL_TRAINING:$SHORT_SHA', '.']
+    env:
+      - 'MLFLOW_TRACKING_URI=$_MLFLOW_TRACKING_URI'
     dir: $_COMPONENTS_FOLDER/$_MODEL_TRAINING
 
   # Build the component of the Kubeflow Pipeline
@@ -39,6 +36,7 @@ steps:
       - 'DATA_TRANSFORMATION=$_DATA_TRANSFORMATION'
       - 'MODEL_TRAINING=$_MODEL_TRAINING'
       - 'MODEL_EVALUATION=$_MODEL_EVALUATION'
+      - 'MLFLOW_TRACKING_URI=$_MLFLOW_TRACKING_URI'
     args:
       - '-c'
 
@@ -79,7 +77,6 @@ steps:
 # Note the lowercase name ('images')
 images:
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_INGESTION:$SHORT_SHA'
-  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_PREPARATION:$SHORT_SHA'
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_TRANSFORMATION:$SHORT_SHA'
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_MODEL_TRAINING:$SHORT_SHA'
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_MODEL_EVALUATION:$SHORT_SHA'

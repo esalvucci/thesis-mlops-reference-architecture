@@ -16,7 +16,6 @@ dependencies:
   - click
   - cryptography
   - pip:
-      - holidays
       - sklearn
       - mlflow
       - xgboost

@@ -9,12 +9,13 @@ entry_points:
   main:
     parameters:
       dataset_path: path
+      version: str
       n_estimators: {type: float, default: 1000}
       learning_rate: {type: float, default: 0.05}
       max_depth: {type: float, default: 6}
       min_child_weight: {type: float, default: 5}
     command: "python3 src/model_training.py {dataset_path} {n_estimators} {learning_rate} {max_depth}
-              {min_child_weight}"
+              {min_child_weight} {version}"
 
   validate:
     parameters:
