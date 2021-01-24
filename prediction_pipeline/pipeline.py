@@ -1,8 +1,8 @@
 import kfp
 import os
-import yaml
 from kfp import components
 from kfp.v2.components import OutputPath
+from kubernetes.client import V1EnvVar
 
 xgboost_predict_on_csv_op = components.load_component_from_url('https://raw.githubusercontent.com/kubeflow/'
                                                                'pipelines/567c04c51ff00a1ee525b3458425b17adbe3df61/'
@@ -60,6 +60,8 @@ def __pipeline(prediction_dataset_name='de.csv', model_name='trained_model.pkl')
     model_file = __data_ingestion_step(model_name, model_path)
 
     predictions = __prediction_step(drop_header.output, prediction_output_path, model_file.output)
+    predictions.container.add_env_variable(V1EnvVar(name='MLFLOW_TRACKING_URI',
+                                                       value=os.environ['MLFLOW_TRACKING_URI']))
 
     data_ingestion.execution_options.caching_strategy.max_cache_staleness = "P0D"
     model_file.execution_options.caching_strategy.max_cache_staleness = "P0D"

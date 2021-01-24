@@ -2,3 +2,4 @@
 **/*.tar.gz
 *.log
 .idea
+training_pipeline/set_env_variables.sh

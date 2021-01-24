@@ -15,6 +15,8 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_MODEL_PREDICTION:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_MODEL_PREDICTION
+    env:
+      - 'MLFLOW_TRACKING_URI=$_MLFLOW_TRACKING_URI' 
 
   # Through the kfp-cli compile the pipeline
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'

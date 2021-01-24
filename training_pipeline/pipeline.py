@@ -39,14 +39,12 @@ def __data_transformation_step(dataset_path):
 
 
 @kfp.dsl.pipeline(name='Forecasting Example')
-def __pipeline(training_dataset_name='it.csv', evaluation_dataset_name='de.csv'):
+def __pipeline(training_dataset_name='it.csv'):
     data_ingestion = __data_ingestion_step(training_dataset_name)
     data_transformation = __data_transformation_step(data_ingestion.output)
     model_training = __model_training_step(data_transformation.output)
     model_training.container.add_env_variable(V1EnvVar(name='MLFLOW_TRACKING_URI',
                                                        value=os.environ['MLFLOW_TRACKING_URI']))
-
-
     model_training.execution_options.caching_strategy.max_cache_staleness = "P0D"
 
 
