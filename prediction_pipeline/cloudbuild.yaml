@@ -16,7 +16,7 @@ steps:
     args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_MODEL_PREDICTION:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_MODEL_PREDICTION
     env:
-      - 'MLFLOW_TRACKING_URI=$_MLFLOW_TRACKING_URI' 
+      - 'MLFLOW_TRACKING_URI=$_MLFLOW_TRACKING_URI'
 
   # Through the kfp-cli compile the pipeline
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
@@ -30,6 +30,7 @@ steps:
       - 'DATA_INGESTION=$_DATA_INGESTION'
       - 'DATA_TRANSFORMATION=$_DATA_TRANSFORMATION'
       - 'MODEL_PREDICTION=$_MODEL_PREDICTION'
+      - 'MLFLOW_TRACKING_URI=$_MLFLOW_TRACKING_URI'
     args:
       - '-c'
 
