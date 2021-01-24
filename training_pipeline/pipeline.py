@@ -10,8 +10,7 @@ def __data_ingestion_step(dataset_name):
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
                   '/' + os.environ['PROJECT_NAME'] + '/' + os.environ['DATA_INGESTION'] + ':' +
                   os.environ['TAG'],
-            arguments=['--file_name', dataset_name,
-                       '--file_path', '/tmp/dataset.csv'],
+            arguments=['--file_name', dataset_name],
             file_outputs={'dataset_path': '/tmp/dataset.csv'}
     )
 
