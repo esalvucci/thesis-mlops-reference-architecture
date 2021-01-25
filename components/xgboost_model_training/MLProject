@@ -1,0 +1,24 @@
+name: stock_forecast
+
+conda_env: src/utility/config/mlflow_env.yaml
+# Can have a docker_env instead of a conda_env, e.g.
+# docker_env:
+#    image:  mlflow-docker-example
+
+entry_points:
+  main:
+    parameters:
+      training_set_path: path
+      test_set_path: path
+      version: str
+      n_estimators: {type: float, default: 1000}
+      learning_rate: {type: float, default: 0.05}
+      max_depth: {type: float, default: 6}
+      min_child_weight: {type: float, default: 5}
+      use_cv: {type: bool, default: True}
+    command: "python3 src/model_training.py {test_set_path} {training_set_path}
+              {n_estimators} {learning_rate} {max_depth} {min_child_weight} {version} {use_cv}"
+  validate:
+    parameters:
+      data_file: path
+    command: "python validate.py {data_file}"

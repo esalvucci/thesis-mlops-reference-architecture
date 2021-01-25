@@ -2,7 +2,7 @@ from enum import Enum
 import logging
 from logging.handlers import RotatingFileHandler
 
-component_name = "model_training"
+component_name = "model_loader"
 log_format = '[%(asctime)s] - %(message)s'
 
 

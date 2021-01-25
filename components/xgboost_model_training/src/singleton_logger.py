@@ -2,7 +2,7 @@ from enum import Enum
 import logging
 from logging.handlers import RotatingFileHandler
 
-component_name = "model_prediction"
+component_name = "xgboost_model_training"
 log_format = '[%(asctime)s] - %(message)s'
 
 

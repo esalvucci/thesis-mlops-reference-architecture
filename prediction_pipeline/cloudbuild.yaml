@@ -8,13 +8,10 @@ steps:
 
   # Build the component of the Kubeflow Pipeline
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_TRANSFORMATION:$SHORT_SHA', '.']
-    dir: $_COMPONENTS_FOLDER/$_DATA_TRANSFORMATION
-
-  # Build the component of the Kubeflow Pipeline
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_MODEL_PREDICTION:$SHORT_SHA', '.']
-    dir: $_COMPONENTS_FOLDER/$_MODEL_PREDICTION
+    args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_MODEL_LOADER:$SHORT_SHA', '.']
+    dir: $_COMPONENTS_FOLDER/$_MODEL_LOADER
+    env:
+      - 'MLFLOW_TRACKING_URI=$_MLFLOW_TRACKING_URI'
 
   # Through the kfp-cli compile the pipeline
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
@@ -26,8 +23,8 @@ steps:
       - 'HOST=$_ENDPOINT'
       - 'PROJECT_NAME=$_PROJECT_NAME'
       - 'DATA_INGESTION=$_DATA_INGESTION'
-      - 'DATA_TRANSFORMATION=$_DATA_TRANSFORMATION'
-      - 'MODEL_PREDICTION=$_MODEL_PREDICTION'
+      - 'MODEL_LOADER=$_MODEL_LOADER'
+      - 'MLFLOW_TRACKING_URI=$_MLFLOW_TRACKING_URI'
     args:
       - '-c'
 
@@ -69,5 +66,4 @@ steps:
 # Note the lowercase name ('images')
 images:
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_INGESTION:$SHORT_SHA'
-  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_DATA_TRANSFORMATION:$SHORT_SHA'
-  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_MODEL_PREDICTION:$SHORT_SHA'
+  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_MODEL_LOADER:$SHORT_SHA'

@@ -1,0 +1,26 @@
+name: mlflow-env
+channels:
+  - defaults
+  - anaconda
+dependencies:
+  - python=3.8
+  - pip
+  - lxml
+  - requests>=2.19.0
+  - pandas
+  - pandas-datareader
+  - matplotlib
+  - numpy
+  - scikit-learn
+  - yaml
+  - click
+  - cryptography
+  - pip:
+      - holidays
+      - sklearn
+      - mlflow
+      - xgboost
+      - google-cloud-storage
+      - boto3
+      - google-cloud-datastore
+      - fire
