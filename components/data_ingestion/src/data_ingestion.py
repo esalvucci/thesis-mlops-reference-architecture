@@ -7,10 +7,7 @@ from singleton_logger import SingletonLogger
 logger = SingletonLogger.get_logger()
 
 
-def __get_data(file_name, start_date, end_date):
-    study_start_date = pd.Timestamp(start_date, tz="utc")
-    study_end_date = pd.Timestamp(end_date, tz="utc")
-
+def __get_data(file_name):
     bucket_name = 'kubeflow-demo'
     folder_path = 'forecast-example'
     output_path = '/tmp/dataset.csv'
@@ -23,7 +20,6 @@ def __get_data(file_name, start_date, end_date):
     df.index = pd.to_datetime(df.index)
     df = df.groupby(pd.Grouper(freq="h")).mean()
     df.index.name = "time"
-    df = df.loc[(df.index >= study_start_date) & (df.index <= study_end_date), :]
     df.to_csv(output_path)
 
 

@@ -3,7 +3,6 @@ import numpy as np
 from singleton_logger import SingletonLogger
 import fire
 import holidays
-from sklearn.model_selection import train_test_split
 
 logger = SingletonLogger.get_logger()
 

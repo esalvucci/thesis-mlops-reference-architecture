@@ -6,4 +6,4 @@ COPY requirements.txt ..
 RUN pip3 install -r ../requirements.txt
 COPY src/*.py ./
 
-ENTRYPOINT ["python3", "data_transformation.py"]
+ENTRYPOINT ["python3", "data_preparation.py"]
