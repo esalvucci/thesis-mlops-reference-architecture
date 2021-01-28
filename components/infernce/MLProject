@@ -7,11 +7,7 @@ conda_env: src/utility/config/mlflow_env.yaml
 
 entry_points:
   main:
-    parameters:
-      training_set_path: path
-      test_set_path: path
-      original_dataset_path: path
-    command: "python3 src/model_training.py {test_set_path} {training_set_path} {original_dataset_path}"
+    command: "python3 src/inference.py"
   validate:
     parameters:
       data_file: path
