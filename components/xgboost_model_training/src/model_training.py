@@ -1,6 +1,6 @@
 from mlflow.entities.model_registry.model_version_stages import STAGE_PRODUCTION
 from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split, cross_val_score, ParameterGrid
+from sklearn.model_selection import ParameterGrid
 from xgboost import XGBRegressor, DMatrix
 from xgboost import cv as xgb_cv
 import pandas as pd
@@ -103,7 +103,7 @@ def __promote(name):
     client.transition_model_version_stage(name, version=2, stage=STAGE_PRODUCTION)
 
 
-def train_model(training_set_path, test_set_path,
+def train_model(training_set_path, test_set_path, original_dataset_path,
                 n_estimators, learning_rate, max_depth, min_child_weight, version, use_cv):
     training_dataset = pd.read_csv(training_set_path)
     test_dataset = pd.read_csv(test_set_path)
@@ -111,6 +111,7 @@ def train_model(training_set_path, test_set_path,
     x_test_set, y_test_set = __split_data_into_x_y(test_dataset)
 
     feature_names, prepared_data = __fit_prep_pipeline(x_training_set)
+    logger.info(feature_names)
     x_training_set = prepared_data.transform(x_training_set)
     x_training_set = pd.DataFrame(x_training_set, columns=feature_names, index=training_dataset.index)
 
@@ -150,6 +151,9 @@ def train_model(training_set_path, test_set_path,
         )
 
         y_test_pred = model.predict(x_test_set)
+        logger.info("x_test_set")
+        pd.set_option("display.max_rows", None, "display.max_columns", None)
+        logger.info(x_test_set.head(1).to_csv())
         rmse = np.sqrt(mean_squared_error(y_test_pred, y_test_set))
         __log_metric("rmse", rmse)
 

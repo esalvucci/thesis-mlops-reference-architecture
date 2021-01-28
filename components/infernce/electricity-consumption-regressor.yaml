@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+    labels:
+        app: electricity-consumption-regressor
+    name: electricity-consumption-regressor
+    namespace: kubeflow
+spec:
+    ports:
+    - name: predict
+      port: 5000
+      targetPort: 5000
+    selector:
+      app: electricity-consumption-regressor
+    type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    labels:
+        app: electricity-consumption-regressor
+    name: electricity-consumption-regressor
+    namespace: kubeflow
+spec:
+    selector:
+        matchLabels:
+            app: electricity-consumption-regressor
+    template:
+        metadata:
+            labels:
+                app: electricity-consumption-regressor
+        spec:
+            containers:
+            - image: <DOCKER_CONTAINER_REGISTRY>/electricity-consumption-regressor
+              imagePullPolicy: IfNotPresent
+              name: electricity-consumption-regressor
+              ports:
+              - containerPort: 5000
