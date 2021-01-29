@@ -1,15 +1,10 @@
 name: stock_forecast
 
-conda_env: src/utility/config/mlflow_env.yaml
-# Can have a docker_env instead of a conda_env, e.g.
-# docker_env:
-#    image:  mlflow-docker-example
+conda_env: config/mlflow_env.yaml
 
 entry_points:
   main:
+    parameters:
+      model_name: str
+      stage: {type: str, default: 'Production'}
     command: "python3 src/model_loader.py"
-
-#  validate:
-#    parameters:
-#      data_file: path
-#    command: "python validate.py {data_file}"

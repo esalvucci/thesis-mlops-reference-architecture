@@ -1,0 +1,15 @@
+name: stock_forecast
+
+conda_env: config/mlflow_env.yaml
+
+entry_points:
+  main:
+    parameters:
+      dataset_path: path
+      original_dataset_path: path
+      n_estimators: {type: int, default: 1000}
+      criterion: {type: str, default: 'mse'}
+      min_samples_leaf: {type: float, default: 0.001}
+      random_state: {type: int, default: 42}
+    command: "python3 src/model_training.py {dataset_path} {original_dataset_path}
+             {n_estimators} {criterion} {min_samples_leaf} {random_state}"

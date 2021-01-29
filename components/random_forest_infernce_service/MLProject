@@ -1,0 +1,9 @@
+name: forecast-example
+
+conda_env: config/mlflow_env.yaml
+
+entry_points:
+  main:
+    parameters:
+      model_path: {type: path, default: '/tmp/model'}
+    command: "python3 src/main.py {model_path}"

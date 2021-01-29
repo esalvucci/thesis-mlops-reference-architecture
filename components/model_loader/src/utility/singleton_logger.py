@@ -7,6 +7,9 @@ log_format = '[%(asctime)s] - %(message)s'
 
 
 class SingletonLogger(Enum):
+    """
+    Singleton implementation used to configure and get a python logger instance
+    """
     @staticmethod
     def get_logger():
         # logger configuration

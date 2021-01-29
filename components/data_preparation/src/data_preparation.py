@@ -1,10 +1,28 @@
 import pandas as pd
 import numpy as np
-from singleton_logger import SingletonLogger
+from utility.singleton_logger import SingletonLogger
 import fire
 import holidays
 
 logger = SingletonLogger.get_logger()
+
+
+def prepare_data(dataset_path):
+    """
+    Prepares the dataset to be used in the model training phase
+    :param dataset_path - The path for the incoming dataset
+    :return:
+    """
+    output_path = '/tmp/dataset.csv'
+    df = pd.read_csv(dataset_path)
+    df = df.drop(columns="end").set_index("start")
+    df.index = pd.to_datetime(df.index)
+    df = df.groupby(pd.Grouper(freq="h")).mean()
+    df.index.name = "time"
+
+    test_set = __add_all_features(df).dropna()
+    test_set.to_csv(output_path)
+    logger.info("Dataset saved in " + output_path)
 
 
 def __add_time_features(df):
@@ -48,19 +66,5 @@ def __split_train_test(df, split_time):
     return df_train, df_test
 
 
-def __prepare_data(dataset_path, training_set_path='/tmp/training_set.csv', test_set_path='/tmp/test_set.csv'):
-    df = pd.read_csv(dataset_path).set_index("time")
-    df.index = pd.to_datetime(df.index)
-    training_set, test_set = __split_train_test(df, pd.Timestamp("2019-02-01", tz="utc"))
-
-    training_set = __add_all_features(training_set).dropna()
-    training_set.to_csv(training_set_path)
-    logger.info("Training dataset saved in " + training_set_path)
-
-    test_set = __add_all_features(test_set).dropna()
-    test_set.to_csv(test_set_path)
-    logger.info("Test dataset saved in " + test_set_path)
-
-
 if __name__ == "__main__":
-    fire.Fire(__prepare_data)
+    fire.Fire(prepare_data)

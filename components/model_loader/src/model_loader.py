@@ -1,23 +1,25 @@
 import fire
 import mlflow
-from singleton_logger import SingletonLogger
+from mlflow.exceptions import RestException
+from utility.singleton_logger import SingletonLogger
 
 logger = SingletonLogger.get_logger()
 
 
-def __get_mlflow_experiment(name):
-    if not mlflow.get_experiment_by_name(name):
-        raise BaseException("The experiment does not exists")
-    return mlflow.get_experiment_by_name(name)
-
-
-def load(model_name, stage):
-    experiment = __get_mlflow_experiment("Default")
-    with mlflow.start_run(experiment_id=experiment.experiment_id):
-        output_path = '/tmp/model'
-        model = mlflow.xgboost.load_model(model_uri=f"models:/{model_name}/{stage}")
-        mlflow.xgboost.save_model(model, output_path)
+def load(model_name, stage='Production'):
+    """
+    Loads a model from the MLFlow Model Registry at the URI specified in the MLFLOW_TRACKING_URI env variable.
+    :param model_name - The name of the model to be retreived
+    :param stage - The stage of the model to be retreived, either 'Staging' or 'Production'
+    :param experiment_name - The experiment
+    """
+    output_path = '/tmp/model'
+    try:
+        model = mlflow.sklearn.load_model(model_uri=f"models:/{model_name}/{stage}")
+        mlflow.sklearn.save_model(model, output_path)
         logger.info("Model loaded and saved in " + output_path)
+    except RestException:
+        logger.error("The model with name " + model_name + " and stage " + stage + "has not been found")
 
 
 if __name__ == "__main__":

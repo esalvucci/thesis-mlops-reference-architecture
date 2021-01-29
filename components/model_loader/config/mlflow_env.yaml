@@ -7,7 +7,7 @@ dependencies:
   - pip
   - pip:
       - mlflow
-      - xgboost
+      - sklearn
       - google-cloud-storage
       - boto3
       - fire

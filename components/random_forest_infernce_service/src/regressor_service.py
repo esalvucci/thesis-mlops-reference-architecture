@@ -2,7 +2,7 @@ import pandas as pd
 from bentoml import env, artifacts, api, BentoService
 from bentoml.adapters import DataframeInput
 from bentoml.frameworks.sklearn import SklearnModelArtifact
-from singleton_logger import SingletonLogger
+from utility.singleton_logger import SingletonLogger
 
 logger = SingletonLogger.get_logger()
 
@@ -11,7 +11,7 @@ logger = SingletonLogger.get_logger()
 @artifacts([SklearnModelArtifact('model')])
 class ElectricityConsumptionRegressorService(BentoService):
     """
-    A minimum prediction service exposing a XGBoost model
+    A minimum prediction service exposing a sklearn model
     """
 
     @api(input=DataframeInput(), batch=True)
