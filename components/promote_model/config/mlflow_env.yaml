@@ -1,0 +1,13 @@
+name: mlflow-env
+channels:
+  - defaults
+  - anaconda
+dependencies:
+  - python=3.8
+  - pip
+  - pip:
+      - mlflow
+      - sklearn
+      - google-cloud-storage
+      - boto3
+      - fire

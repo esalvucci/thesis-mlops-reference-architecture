@@ -1,12 +1,12 @@
 #!/bin/bash
 pipeline_name='forecasting_example'
-component_name='random_forest_regressor'
+component_name='model_loader'
 docker_container=$DOCKER_CONTAINER_REGISTRY_BASE_URL
 image_name=${docker_container}/${pipeline_name}/${component_name} # Specify the image name here
 image_tag=$TAG
 full_image_name=${image_name}:${image_tag}
 
-docker build -t ${full_image_name} .
+docker build -t "${full_image_name}" .
 docker push "$full_image_name"
 
 # Output the strict image name (which contains the sha256 image digest)

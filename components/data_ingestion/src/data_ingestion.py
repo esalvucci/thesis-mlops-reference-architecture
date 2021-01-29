@@ -24,6 +24,7 @@ def get_data(file_name, bucket_name, folder_name):
     try:
         bucket = client.get_bucket(bucket_name)
         bucket.blob(os.path.join(folder_name, file_name)).download_to_filename(output_path)
+        logger.info("Data saved in " + output_path)
     except NotFound:
         logger.error("File or Bucket have not been found")
 

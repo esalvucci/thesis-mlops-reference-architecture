@@ -1,0 +1,10 @@
+name: stock_forecast
+
+conda_env: config/mlflow_env.yaml
+
+entry_points:
+  main:
+    parameters:
+      model_name: str
+      stage: {type: str, default: 'Production'}
+    command: "python3 src/model_loader.py"

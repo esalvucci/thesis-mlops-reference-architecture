@@ -1,0 +1,14 @@
+name: stock_forecast
+
+conda_env: config/mlflow_env.yaml
+
+entry_points:
+  main:
+    parameters:
+      dataset_path: path
+      original_dataset_path: path
+      penalty: {type: str, default: 'elasticnet'}
+      tol: {type: int, default: 10}
+      random_state: {type: int, default: 42}
+    command: "python3 src/model_training.py {dataset_path} {original_dataset_path}
+             {penalty} {tol} {random_state}"

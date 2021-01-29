@@ -1,5 +1,5 @@
 from pandas.io import json
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import SGDRegressor
 from sklearn.metrics import mean_squared_error
 import pandas as pd
 import fire
@@ -14,17 +14,16 @@ logger = SingletonLogger.get_logger()
 metrics_info = {'metrics': []}
 
 
-def train_model(dataset_path, original_dataset_path, n_estimators, criterion, min_samples_leaf, random_state):
+def train_model(dataset_path, original_dataset_path, penalty, tol, random_state):
     """
-    Trains a Random Forest Regressor model and save it on the MLFlow Model Registry.
+    Trains a SGD Regressor model and save it on the MLFlow Model Registry.
     :param dataset_path: The path of the dataset to be used for the training.
     :param original_dataset_path: The path of the dataset before the data preparation phase.
-    :param n_estimators: the number of estimators for the regression model.
-    :param criterion: The function to measure the quality of a split.
-    :param min_samples_leaf: The minimum number of samples required to be at a leaf node.
+    :param penalty: The penalty (aka regularization term) to be use
+    :param tol: The stopping criterion
     :param random_state: Controls both the randomness of the bootstrapping of the samples used when building trees
     """
-    model_name = "random_forest_regressor"
+    model_name = "SGD_regressor"
     dataset = pd.read_csv(dataset_path)
     electricity_consumption_dataset = ElectricityConsumptionDataset(dataset)
     x_training_set, y_training_set = electricity_consumption_dataset.get_training_set()
@@ -35,7 +34,7 @@ def train_model(dataset_path, original_dataset_path, n_estimators, criterion, mi
         mlflow.set_experiment(model_name)
         __log_parameter("Original Dataset", original_dataset_path)
 
-        model = __get_model(n_estimators, criterion, min_samples_leaf, random_state)
+        model = __get_model(penalty, tol, random_state)
 
         logger.info("Training started")
         model.fit(x_training_set, y_training_set)
@@ -101,13 +100,8 @@ def __get_mlflow_experiment(name):
     return mlflow.get_experiment_by_name(name)
 
 
-def __get_model(n_estimators, criterion, min_samples_leaf, random_state):
-    return RandomForestRegressor(
-            n_estimators=n_estimators,
-            criterion=criterion,
-            min_samples_leaf=min_samples_leaf,
-            random_state=random_state
-    )
+def __get_model(penalty, tol, random_state):
+    return SGDRegressor(penalty=penalty, tol=tol, random_state=random_state)
 
 
 if __name__ == "__main__":
