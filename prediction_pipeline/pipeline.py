@@ -20,6 +20,8 @@ def __data_ingestion_step(file_name: str):
             file_outputs={'output': '/tmp/dataset.csv'}
     )
 
+# Data preparaton
+
 
 def __load_model_step(model_name, model_stage):
     return kfp.dsl.ContainerOp(

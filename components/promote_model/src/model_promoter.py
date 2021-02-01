@@ -6,17 +6,14 @@ from utility.singleton_logger import SingletonLogger
 logger = SingletonLogger.get_logger()
 
 
-def __get_last_version_model(model_name):
-    def get_last_version_number():
-        client = MlflowClient()
-        versions = list()
-        filter_string = "name='" + model_name + "'"
-        for model_version in client.search_model_versions(filter_string):
-            versions.append(model_version.version)
-        logger.info("Last version " + max(versions))
-        return max(versions)
-    version_number = get_last_version_number()
-    return mlflow.xgboost.load_model(model_uri=f"models:/{model_name}/{version_number}")
+def __get_last_version_number(model_name):
+    client = MlflowClient()
+    versions = list()
+    filter_string = "name='" + model_name + "'"
+    for model_version in client.search_model_versions(filter_string):
+        versions.append(int(model_version.version))
+    logger.info(model_name + " - Last version " + str(max(versions)))
+    return max(versions)
 
 
 def promote(model_name, stage='Production'):
@@ -26,7 +23,7 @@ def promote(model_name, stage='Production'):
     :param stage - The stage of the model to be promoted, either 'Staging' or 'Production'
     """
     client = MlflowClient()
-    version = __get_last_version_model(model_name)
+    version = __get_last_version_number(model_name)
     client.transition_model_version_stage(model_name, version=version, stage=stage)
 
 

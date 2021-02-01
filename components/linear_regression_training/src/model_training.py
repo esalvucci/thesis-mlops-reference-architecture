@@ -1,4 +1,4 @@
-from pandas.io import json
+import json
 from sklearn.linear_model import SGDRegressor
 from sklearn.metrics import mean_squared_error
 import pandas as pd
@@ -23,7 +23,7 @@ def train_model(dataset_path, original_dataset_path, penalty, tol, random_state)
     :param tol: The stopping criterion
     :param random_state: Controls both the randomness of the bootstrapping of the samples used when building trees
     """
-    model_name = "SGD_regressor"
+    model_name = "sgd_regressor"
     dataset = pd.read_csv(dataset_path)
     electricity_consumption_dataset = ElectricityConsumptionDataset(dataset)
     x_training_set, y_training_set = electricity_consumption_dataset.get_training_set()
@@ -74,20 +74,21 @@ def __log_metric(name, value):
     """
     logger.info(name + ": " + str(value))
     mlflow.log_metric(name, value)
+    __save_metric_to_file(name, value)
 
 
 def __save_metric_to_file(name, value):
     global metrics_info
     metrics_info['metrics'].append({
-        'metrics': [{
             'name': name,
-            'numberValue': float(value)
-        }]})
-    with open('/tmp/mlpipeline-metrics.json', 'w') as f:
-        json.dumps(metrics_info, f)
+            'value': float(value)
+        })
+    with open('/tmp/metrics.json', 'w') as metrics_file:
+        json.dump(metrics_info, metrics_file)
 
-    with open('/tmp/' + name, 'w') as output_file:
-        output_file.write(str(float(value)))
+    metric_file_path = '/tmp/' + name
+    with open(metric_file_path, 'w') as value_file:
+        value_file.write(str(value))
 
 
 def __get_mlflow_experiment(name):
@@ -101,7 +102,7 @@ def __get_mlflow_experiment(name):
 
 
 def __get_model(penalty, tol, random_state):
-    return SGDRegressor(penalty=penalty, tol=tol, random_state=random_state)
+    return SGDRegressor(penalty=penalty, tol=tol, random_state=random_state, verbose=True)
 
 
 if __name__ == "__main__":

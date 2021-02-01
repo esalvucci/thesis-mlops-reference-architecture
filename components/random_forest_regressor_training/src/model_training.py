@@ -1,4 +1,4 @@
-from pandas.io import json
+import json
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 import pandas as pd
@@ -36,7 +36,6 @@ def train_model(dataset_path, original_dataset_path, n_estimators, criterion, mi
         __log_parameter("Original Dataset", original_dataset_path)
 
         model = __get_model(n_estimators, criterion, min_samples_leaf, random_state)
-
         logger.info("Training started")
         model.fit(x_training_set, y_training_set)
         logger.info("Training finished")
@@ -75,20 +74,21 @@ def __log_metric(name, value):
     """
     logger.info(name + ": " + str(value))
     mlflow.log_metric(name, value)
+    __save_metric_to_file(name, value)
 
 
 def __save_metric_to_file(name, value):
     global metrics_info
     metrics_info['metrics'].append({
-        'metrics': [{
             'name': name,
-            'numberValue': float(value)
-        }]})
-    with open('/tmp/mlpipeline-metrics.json', 'w') as f:
-        json.dumps(metrics_info, f)
+            'value': float(value)
+        })
+    with open('/tmp/metrics.json', 'w') as metrics_file:
+        json.dump(metrics_info, metrics_file)
 
-    with open('/tmp/' + name, 'w') as output_file:
-        output_file.write(str(float(value)))
+    metric_file_path = '/tmp/' + name
+    with open(metric_file_path, 'w') as value_file:
+        value_file.write(str(value))
 
 
 def __get_mlflow_experiment(name):
@@ -103,10 +103,12 @@ def __get_mlflow_experiment(name):
 
 def __get_model(n_estimators, criterion, min_samples_leaf, random_state):
     return RandomForestRegressor(
-            n_estimators=n_estimators,
-            criterion=criterion,
-            min_samples_leaf=min_samples_leaf,
-            random_state=random_state
+        n_estimators=n_estimators,
+        criterion=criterion,
+        min_samples_leaf=min_samples_leaf,
+        random_state=random_state,
+        verbose=True,
+        n_jobs=4
     )
 
 
