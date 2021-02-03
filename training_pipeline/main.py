@@ -1,16 +1,22 @@
 import kfp
+import kfp.compiler as compiler
+import kfp.dsl as dsl
+from google.cloud import storage
 import os
+import logging
 from kubernetes.client import V1EnvVar
 
+HOST = 'https://34727f9010a6d1aa-dot-asia-east1.pipelines.googleusercontent.com'
+EXPERIMENT_NAME = 'Forecast Example - Training'
 
-def __data_ingestion_step(dataset_name, bucket_name, folder_name):
+
+def __data_ingestion_step(dataset_name, bucket_name):
     return kfp.dsl.ContainerOp(
             name='data_ingestion',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] + '/' + os.environ['PROJECT_NAME'] + '/' +
                   os.environ['DATA_INGESTION'] + ':' + os.environ['TAG'],
             arguments=['--file_name', dataset_name,
-                       '--bucket_name', bucket_name,
-                       '--folder_name', folder_name],
+                       '--bucket_name', bucket_name],
             file_outputs={'dataset_path': '/tmp/dataset.csv'}
     )
 
@@ -46,14 +52,31 @@ def __promotion_step(model_name):
     )
 
 
+def run_pipeline(data, context):
+    client = kfp.Client(host=HOST)
+    compiler.Compiler().compile(pipeline, '/tmp/pipeline.tar.gz')
+    exp = client.create_experiment(name=EXPERIMENT_NAME)  # this is a 'get or create' op
+    result = client.run_pipeline(exp.id, data['name'] + " updated", '/tmp/pipeline.tar.gz', params={})
+    logging.info('Event ID: {}'.format(context.event_id))
+    logging.info('Event type: {}'.format(context.event_type))
+    logging.info('Data: {}'.format(data))
+    logging.info('Bucket: {}'.format(data['bucket']))
+    logging.info('File: {}'.format(data['name']))
+    file_uri = 'gs://%s/%s' % (data['bucket'], data['name'])
+    logging.info('Using file uri: %s', file_uri)
+    logging.info('Metageneration: {}'.format(data['metageneration']))
+    logging.info('Created: {}'.format(data['timeCreated']))
+    logging.info('Updated: {}'.format(data['updated']))
+    logging.info(result)
+
+
 @kfp.dsl.pipeline(name='Forecasting Example')
-def __pipeline(training_dataset_name: str = 'it.csv',
-               bucket_name: str = 'kubeflow-demo',
-               folder_name: str = 'forecast-example'):
-    original_dataset_path = str(os.path.join('gs://', 'kubeflow-demo', 'forecast-example', 'it.csv'))
+def pipeline(training_dataset_name: str = 'it.csv',
+             bucket_name: str = 'forecast-example'):
+    original_dataset_path = str(os.path.join('gs://', 'forecast-example', 'it.csv'))
 
     # Data Ingestion step
-    data_ingestion = __data_ingestion_step(training_dataset_name, bucket_name, folder_name)
+    data_ingestion = __data_ingestion_step(training_dataset_name, bucket_name)
 
     # Data Preparation step
     data_preparation = __data_preparation_step(data_ingestion.output)
@@ -90,3 +113,5 @@ def __pipeline(training_dataset_name: str = 'it.csv',
     linear_regression_model_training.execution_options.caching_strategy.max_cache_staleness = "P0D"
 
 
+if __name__ == "__main__":
+    run_pipeline({}, {})

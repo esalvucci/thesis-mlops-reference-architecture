@@ -7,7 +7,7 @@ from utility.singleton_logger import SingletonLogger
 logger = SingletonLogger.get_logger()
 
 
-def get_data(file_name, bucket_name, folder_name):
+def get_data(file_name, bucket_name):
     """
     Retrieves the dataset from a bucket on Google Cloud Storage
 
@@ -23,7 +23,7 @@ def get_data(file_name, bucket_name, folder_name):
     client = storage.Client()
     try:
         bucket = client.get_bucket(bucket_name)
-        bucket.blob(os.path.join(folder_name, file_name)).download_to_filename(output_path)
+        bucket.blob(file_name).download_to_filename(output_path)
         logger.info("Data saved in " + output_path)
     except NotFound:
         logger.error("File or Bucket have not been found")
