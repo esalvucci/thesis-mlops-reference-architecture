@@ -8,7 +8,7 @@ from utility.singleton_logger import SingletonLogger
 import numpy as np
 
 logger = SingletonLogger.get_logger()
-columns = pd.Index(['start', 'end', 'load'], dtype=bool)
+columns = np.array(['start', 'end', 'load'])
 
 
 def get_all_files_in_bucket(bucket_name):
@@ -18,7 +18,8 @@ def get_all_files_in_bucket(bucket_name):
 
 
 def dataset_columns_match_with(df_columns):
-    return np.all(df_columns, columns)
+    comparison = columns == np.array(df_columns)
+    return comparison.all()
 
 
 def get_all_feasible_files_in(directory):
