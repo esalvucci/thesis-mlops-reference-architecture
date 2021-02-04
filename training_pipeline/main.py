@@ -10,13 +10,12 @@ HOST = 'https://34727f9010a6d1aa-dot-asia-east1.pipelines.googleusercontent.com'
 EXPERIMENT_NAME = 'Forecast Example - Training'
 
 
-def __data_ingestion_step(dataset_name, bucket_name):
+def __data_ingestion_step(bucket_name):
     return kfp.dsl.ContainerOp(
             name='data_ingestion',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] + '/' + os.environ['PROJECT_NAME'] + '/' +
                   os.environ['DATA_INGESTION'] + ':' + os.environ['TAG'],
-            arguments=['--file_name', dataset_name,
-                       '--bucket_name', bucket_name],
+            arguments=['--bucket_name', bucket_name],
             file_outputs={'dataset_path': '/tmp/dataset.csv'}
     )
 
@@ -37,7 +36,7 @@ def __model_training_step(component_name, dataset_path, original_dataset_path):
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] + '/' + os.environ['PROJECT_NAME'] + '/' +
             str(component_name) + ':' + os.environ['TAG'],
             arguments=['--dataset_path', kfp.dsl.InputArgumentPath(dataset_path),
-                       '--original_dataset_path', kfp.dsl.InputArgumentPath(original_dataset_path)],
+                       '--original_dataset_path', str(original_dataset_path)],
             file_outputs={'metrics': '/tmp/metrics.json',
                           'rmse': '/tmp/rmse'}
     )
@@ -71,12 +70,11 @@ def run_pipeline(data, context):
 
 
 @kfp.dsl.pipeline(name='Forecasting Example')
-def pipeline(training_dataset_name: str = 'it.csv',
-             bucket_name: str = 'forecast-example'):
+def pipeline(bucket_name: str = 'forecast-example'):
     original_dataset_path = str(os.path.join('gs://', 'forecast-example', 'it.csv'))
 
     # Data Ingestion step
-    data_ingestion = __data_ingestion_step(training_dataset_name, bucket_name)
+    data_ingestion = __data_ingestion_step(bucket_name)
 
     # Data Preparation step
     data_preparation = __data_preparation_step(data_ingestion.output)
