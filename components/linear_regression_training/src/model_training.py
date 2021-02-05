@@ -4,7 +4,8 @@ from sklearn.metrics import mean_squared_error
 import pandas as pd
 import fire
 import numpy as np
-from electricity_consumption_dataset import ElectricityConsumptionDataset
+from sklearn.model_selection import train_test_split
+
 from utility.singleton_logger import SingletonLogger
 import mlflow
 from google.cloud import storage
@@ -25,9 +26,9 @@ def train_model(dataset_path, original_dataset_path, penalty, tol, random_state)
     """
     model_name = "sgd_regressor"
     dataset = pd.read_csv(dataset_path)
-    electricity_consumption_dataset = ElectricityConsumptionDataset(dataset)
-    x_training_set, y_training_set = electricity_consumption_dataset.get_training_set()
-    x_test_set, y_test_set = electricity_consumption_dataset.get_test_set()
+    training_set, test_set = train_test_split(dataset, test_size=0.33)
+    x_training_set, y_training_set = __split_into_x_y(training_set)
+    x_test_set, y_test_set = __split_into_x_y(test_set)
     experiment = __get_mlflow_experiment(model_name)
 
     with mlflow.start_run(experiment_id=experiment.experiment_id):
@@ -37,6 +38,7 @@ def train_model(dataset_path, original_dataset_path, penalty, tol, random_state)
         model = __get_model(penalty, tol, random_state)
 
         logger.info("Training started")
+        logger.info(y_training_set)
         model.fit(x_training_set, y_training_set)
         logger.info("Training finished")
 
@@ -44,6 +46,14 @@ def train_model(dataset_path, original_dataset_path, penalty, tol, random_state)
         rmse = np.sqrt(mean_squared_error(y_test_pred, y_test_set))
         __log_metric("rmse", rmse)
         __save(model, model_name)
+
+
+def __split_into_x_y(data):
+    target_column = "load"
+    x = data.drop(columns=target_column)
+    y = data.loc[:, target_column]
+    logger.info("Data splitted into x and y")
+    return x, y
 
 
 def __save(model, name):

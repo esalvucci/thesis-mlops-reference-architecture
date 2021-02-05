@@ -2,4 +2,4 @@
 **/*.tar.gz
 *.log
 .idea
-**/set_env_variables.sh
+**/.env.yaml
