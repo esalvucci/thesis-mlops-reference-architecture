@@ -32,7 +32,6 @@ steps:
       - 'MLFLOW_TRACKING_URI=$_MLFLOW_TRACKING_URI'
     args:
       - '-c'
-
       # dsl-compile --py <PYHTON_FILE_NAME> --output <COMPILED_PIPELINE_FILENAME>
       - 'dsl-compile --py main.py --output training_pipeline.tar.gz'
     dir: $_PIPELINE_FOLDER
