@@ -25,7 +25,7 @@ def train_model(dataset_path, original_dataset_path, penalty, tol, random_state)
     :param random_state: Controls both the randomness of the bootstrapping of the samples used when building trees
     """
     model_name = "sgd_regressor"
-    dataset = pd.read_csv(dataset_path)
+    dataset = pd.read_csv(dataset_path).set_index('time')
     training_set, test_set = train_test_split(dataset, test_size=0.33)
     x_training_set, y_training_set = __split_into_x_y(training_set)
     x_test_set, y_test_set = __split_into_x_y(test_set)
@@ -38,7 +38,6 @@ def train_model(dataset_path, original_dataset_path, penalty, tol, random_state)
         model = __get_model(penalty, tol, random_state)
 
         logger.info("Training started")
-        logger.info(y_training_set)
         model.fit(x_training_set, y_training_set)
         logger.info("Training finished")
 

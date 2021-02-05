@@ -41,14 +41,14 @@ class ElectricityConsumptionDataset:
     @staticmethod
     def __fit_column_transformer(data):
         """
-        Apply one-hot encoders on categorical feratures (time features), and a standard scaler on numerical features
+        Apply one-hot encoders on categorical features (time features), and a standard scaler on numerical features
         :param data - The data to apply the encoders and the scaler. Input data, of which specified subsets
                       are used to fit the transformers
         :return: The feature names and the column transformer
         """
         categorical_features = ["month", "weekday", "hour"]
         boolean_features = ["holiday"]
-        numerical_features = [c for c in data.columns if c.startswith("load_lag") or c.startswith('load')]
+        numerical_features = [c for c in data.columns if c.startswith("load_lag")]
         column_transformer = ColumnTransformer([
             ("cat", OneHotEncoder(), categorical_features),
             ("bool", FunctionTransformer(), boolean_features),

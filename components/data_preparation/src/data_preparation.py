@@ -19,9 +19,10 @@ def prepare_data(dataset_path):
     df = df.groupby(pd.Grouper(freq="h")).mean()
     df.index.name = "time"
     electricity_consumption_dataset = ElectricityConsumptionDataset(df)
-    df = electricity_consumption_dataset.get_transformed_dataset()
-    logger.info(df)
-    df.to_csv(output_path)
+    dataset = electricity_consumption_dataset.get_transformed_dataset()
+    if 'load' in df.columns:
+        dataset['load'] = df['load']
+    dataset.to_csv(output_path)
     logger.info("Dataset saved in " + output_path)
 
 
