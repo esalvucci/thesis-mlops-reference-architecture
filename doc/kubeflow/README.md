@@ -1,16 +1,17 @@
 # [Kubeflow](https://kubeflow.org)
 This example build a pipeline to make forecast predictions; it shows how
-to store (and retreive data in the next step) through a bucket in Google Cloud Platform.
-It also shows how to use Kubeflow Reusable Components and build a 'non sequential' pipeline specifing depencencies between
-the components of the pipeline.
+to retreive data from a bucket in Google Cloud Platform and pass the data between the components.
+It also shows how to use Kubeflow Reusable Components and build a 'non sequential' pipeline specifing depencencies
+between the components of the pipeline.
 
 In the following paragraph is explained how to compile and run the Kubeflow pipeline manually, refer to the
-[Cloud Build](/doc/google_cloud_build) documentation to run the pipeline through an automatic trigger.
+[Cloud Build](/doc/google_cloud_build) and [Cloud Functions](/doc/google_cloud_functions) documentation to run the
+pipeline through an automatic trigger.
 
 ## Component folder structure
-According to the [Best Practices for Designing Components](https://www.kubeflow.org/docs/pipelines/sdk/best-practices/) 
+As the [Best Practices for Designing Components](https://www.kubeflow.org/docs/pipelines/sdk/best-practices/)
 and [Organizing the component files](https://www.kubeflow.org/docs/pipelines/sdk/component-development/#organizing-the-component-files)
-each component is organized according to the following structure.
+suggest each component is organized according to the following structure.
 
 ```
 <component_name>/ 
@@ -33,7 +34,7 @@ To install Kubeflow Pipelines SDK on your local machine follow the instructions 
 [Kubeflow Pipeline SDK install](https://www.kubeflow.org/docs/pipelines/sdk/install-sdk/)
 
 ## Build docker image
-This example uses docker containers in each step.
+This example uses a docker container in each step.
 To build an image from the Dockerfile (in each component) run the following instructions
 
 Make sure you are logged in your docker container registry
@@ -47,7 +48,7 @@ On the command line run
 export DOCKER_CONTAINER_REGISTRY_BASE_URL='your docker container registry base url'
 ```
 
-If you are using the docker container registry your base url will be in the form "docker.io/username"
+If you are using Docker Hub as container registry your base url will be in the form "docker.io/username"
 
 In the component directory run
 
@@ -64,14 +65,16 @@ In this example you will find two 'pipeline' folders: a 'training' pipeline and 
 Move in one of the two directories and follow the instructions below.
 
 ### Use the Kubeflow SDK to write a python file to define your pipeline
+You can find the pipelines code in this example in the {prediction_pipeline, training_pipeline}/main.py file. 
+
 [Doc Link](https://www.kubeflow.org/docs/pipelines/sdk/)
 
 ### Compile your Kubeflow pipeline
 ```
-dsl-compile --py pipeline.py --output pipeline.tar.gz
+dsl-compile --py main.py --output pipeline.tar.gz
 ```
 
 (change the input and output file names according to your pipeline python file)
 
-## Upload and run the pipeline in Kubeflow Pipelines
+## Manually upload and run the pipeline in Kubeflow Pipelines
 Now you are ready to upload and run the pipeline on Kubeflow Pipeline

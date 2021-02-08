@@ -9,8 +9,9 @@ and will upload and run the Kubeflow Pipeline.
 Two different triggers are used, respectively, to build and run the [training pipeline](/training_pipeline/cloudbuild.yaml)
 and the [prediction pipeline](/prediction_pipeline/cloudbuild.yaml).
 
-Both the cloudbuild config file specify will trigger the following:
-* Build each component of the Kubeflow Pipeline and push it to the Container Registry.
+Both the cloudbuild config file will trigger the following steps:
+* Build each component of the Kubeflow Pipeline (such it could have new code) and push it to the Container Registry
+(gcr.io in this example).
 * Through the kfp-cli compile the pipeline and upload a new version of it to the Kubeflow Pipeline specified endpoint.
 * Through the kfp-cli trigger the new pipeline verison run.
 
@@ -40,8 +41,8 @@ In each step the name is the URI of the corresponding cloud builder container;
 args contain the arguments to be passed to the entry points. The 'dir' is the CWD in the Docker container from which
 the entrypoint is executed. 
 
-The 'env' property allow to pass the container environment variables (which values are specified in the trigger settings),
-through the Substitution mechanism.
+The 'env' property allows you to pass to the container some environment variables (which values are specified in the
+trigger settings), through the Substitution mechanism.
 
 In the args property we build the image locally. We also need to push the built image to a docker container registry.
 This operation is specified in the 'images' property.
@@ -50,7 +51,8 @@ This operation is specified in the 'images' property.
 You can execute the Cloud build either manually or through automated triggers.
 
 Manually: Run ``` gcloud builds submit ``` on the cloudbuild.yaml with the proper substitutions.
-Automated triggers: When the code thanges in your repository (for example when a push, pull request or new tag event occurs).
+
+Automated triggers: When the code changes in your repository (for example when a push, pull request or new tag event occurs).
 
 The [Substitution mechanism](#substitutions) is used to pass to the cloudbuild config file the values of variables
 according to a specific run.
@@ -81,7 +83,7 @@ the individual cloud builders are run.
 In your cloudbuild.yaml file you can use variables with a dollar sign **followed by an underscore ('_')** and a variable
 name.
 
-You can specify the effective substitution variables on the trigger settings as showed on the following image.
+You can specify the effective substitution variables on the trigger settings as shown on the following image.
 
 ![Substitution variables setting example](/doc/images/gcbuild_substitution_variables_example.png)
 
