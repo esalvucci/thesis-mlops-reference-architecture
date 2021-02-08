@@ -2,7 +2,7 @@ from enum import Enum
 import logging
 from logging.handlers import RotatingFileHandler
 
-component_name = "random_forest_infernce_service"
+component_name = "scikitlearn_infernce_service"
 log_format = '[%(asctime)s] - %(message)s'
 
 

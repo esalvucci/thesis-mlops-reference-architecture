@@ -1,4 +1,4 @@
-# Google Cloud Functions
+# [Google Cloud Functions](https://cloud.google.com/functions/docs/)
 Cloud Functions is a lightweight compute solution for developers to create single-purpose, stand-alone functions that respond to Cloud events without the need to manage a server or runtime environment. [Link](https://cloud.google.com/functions/docs/)
 
 In this project a function is used to provide Continuous Training; whenever a new file is uploaded to the bucket
