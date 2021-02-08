@@ -5,7 +5,6 @@ import pandas as pd
 import fire
 import numpy as np
 from sklearn.model_selection import train_test_split
-
 from utility.singleton_logger import SingletonLogger
 import mlflow
 from google.cloud import storage
