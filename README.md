@@ -16,8 +16,10 @@ Use the following links to read the detailed documentation about how each techno
 
 * [MLFlow](doc/mlflow) - Used to track the experiments log, the model versions and to store them in a Model Registry
 * [Kubeflow](doc/kubeflow) - Used to orchestrate the ML workflow
-* [Google Cloud Build](doc/google_cloud_build) - Used to build a CI pipeline 
-
+* Google Cloud Platform
+    * [Google Cloud Build](doc/google_cloud_build) - Used to build a CI pipeline 
+    * [Google Cloud Functions](doc/google_cloud_functions) - Used to run the Kubeflow pipeline whenever
+a file is added or updated in the bucket used for the training dataset.
 ![Project Architecture](/doc/images/architecture.png)
 
 ## Licence
