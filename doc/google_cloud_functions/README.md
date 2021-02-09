@@ -34,8 +34,8 @@ export TRIGGER_BUCKET=my-bucket-name
 ```
 
 ## The function
-In the training_pipeline/main.py file you have a function named 'run_pipeline', which is the Cloud Function
-to be triggered by Cloud Storage. This generic function logs relevant data when a file is changed, compiles
+In the /training_pipeline/main.py file you have a function named 'run_pipeline', which is the Cloud Function
+to be triggered. This generic function logs relevant data when a file is changed, compiles
 the training Kubeflow pipeline and runs it.
 
 Be careful to change the HOST variable value with your Kubeflow address and the experiment named EXPERIMENT_NAME

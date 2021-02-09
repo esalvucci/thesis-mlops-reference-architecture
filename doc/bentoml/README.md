@@ -7,13 +7,9 @@ on Kubernetes, through Kubeflow.
 ## Install
 
 ```
-pip3 install bentoml
+pip3 install bentoml scikit-learn
 ```
  
-```
-pip3 install scikit-learn
-```
-
 The code for this example is in [/components/scikitlearn_infernce_service](/components/scikitlearn_infernce_service).
 
 ## BentoML Service
@@ -29,13 +25,13 @@ that covers most model serving use cases including DataframeInput, TfTensorInput
 and JsonInput.
 
 To save the BentoService instance, simply call the 'save' method, BentoML will:
-* Saves the model based on the ML training framework and artifact type used
-* Automatically extracts all the pip dependencies required by your BentoService class and put into a requirements.txt file
-* Saves all the local python code dependencies
+* Save the model based on the ML training framework and artifact type used
+* Automatically extract all the pip dependencies required by your BentoService class and put into a requirements.txt file
+* Save all the local python code dependencies
 * Put all the generated files into one file directory, which, by default, is a location managed by BentoML
 
 ## Create the BentoML Service
-The name of the service in this example will be ElectricityConsumptionRegressorService, and its code is in the
+The name of the service in this example is ElectricityConsumptionRegressorService, and its code is in the
 src/regressor_service.py file.
 
 Move to your service directory by running, from the root of this repository,
@@ -81,7 +77,7 @@ Deployment.
 The yaml file for this example is in
 [electricity-consumption-regressor.yaml](/components/scikitlearn_infernce_service/electricity-consumption-regressor.yaml)
 
-Replace <DOCKER_CONTAINER_REGISTRY> with your Docker Hub username (or gcr.io or other).
+Replace <DOCKER_CONTAINER_REGISTRY> with your Docker Hub uri and username (or gcr.io or other).
 
 Use Kubectl CLI to deploy your model server to the cluster.
 
@@ -95,8 +91,8 @@ curl -i --request POST --header "Content-Type: application/json" --data <your da
 <endpoint ip>:<endpoint port>/predict
 ```
 
-You alternatively can try your endpoint by the OpenAPI UI provided by BentoML. Go with your browser at
-```<endpoint ip>:<endpoint port>```
+You alternatively can try your endpoint by the OpenAPI UI provided by BentoML.
+Go with your browser at ```<endpoint ip>:<endpoint port>```
 
 You should see something like
 ![BentoML OpenAPI example](/doc/images/bentoml_openapi_endpoint_example.png)

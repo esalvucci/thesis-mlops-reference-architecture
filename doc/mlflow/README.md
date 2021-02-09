@@ -4,6 +4,8 @@ This example shows how to install an mlflow server on Google Cloud Platform and 
 run mlflow either from your local machine or within a docker container (for example to
 run mlflow in a component of a Kubeflow pipeline).
 
+See the (Official Documentation](https://mlflow.org/docs/latest/index.html) for further details about MLFlow features.
+
 ## MLFlow usage in this repository 
 In this repository both the components [linear_regression_training](/components/linear_regression_training) and
 [random_forest_regressor_training](/components/random_forest_regressor_training) use MLFlow to track parameters, metrics
@@ -30,15 +32,17 @@ mlflow ui --backend-store-uri sqlite:///mlflow.db
 ```
 
 To run the linear_regression_training component (only) locally please comment the line
-```client = storage.Client()``` in the src/model_training.py file.
+```client = storage.Client()``` in the src/model_training.py file, you will need it to run mlflow with
+a remote tracking uri.
 
-Now you can run the code in your component by the following command:
+Now you can execute the code in your component by running the following command:
 ```
 mlflow run . -P dataset_path=/tmp/dataset.csv -P original_dataset_path=/tmp/datasets/de.csv
 ```
 
-Make sure you actually have the files specified in 'dataset_path' and original_dataset_path.
-As an alternative you can run the 'run_mlflow.sh' script (wich is used by the component when executed within the
+Make sure you actually have the files specified in 'dataset_path' and 'original_dataset_path'. The 'dataset_path' is the
+path to the output of the data preparation step in the Kubeflow pipeline.
+As an alternative you can run the 'run_mlflow.sh' script (which is used by the component when executed within the
 Kubeflow pipeline).
 
 Note that, to run mlflow locally, you must run the 'mlflow run' command from the same directory you have run 'mlflow ui'
@@ -53,8 +57,8 @@ You also need to install git in your Docker container. Refer to this
 [Issue](https://github.com/esalvucci/mlops-architecture-example/issues/1) for further details about that.
 
 The [run_mlflow.sh](/components/linear_regression_training/run_mlflow.sh) script is used now to run mlflow.
-Such the Kubeflow pipleine must pass multiple parameters to the component wich uses mlflow, using a bash script to run
-it is a workaround to manage multiple parameters be passed to the docker ENDPOINT.
+As the Kubeflow pipleine has to pass multiple parameters to the component wich uses mlflow, using a bash script to run
+it is a workaround to manage multiple parameters to be passed to the docker ENDPOINT.
 
 ## Run MLFlow project on Google Cloud Platform 
 * On the Cloud side
@@ -72,7 +76,9 @@ it is a workaround to manage multiple parameters be passed to the docker ENDPOIN
             * Access scopes: Allow full access to all Cloud APIs
         * Firewall
             * Allow both HTTP and HTTPS traffic
-        * Network tags: http-server, https-server, <your instance name>
+        * Network tags: http-server, https-server, your_instance_name
+    
+        Replace 'your_instance_name' with your actual instance name (mlflow_server in this example)
     
     * SSH your VM from the console and install mlflow and google cloud storage
     
@@ -111,13 +117,14 @@ it is a workaround to manage multiple parameters be passed to the docker ENDPOIN
         ```
 
     * Create a firewall rule
+    
         Click on "Setup Firewall Rules" (at the bottom of the instances table) and select "Create Firewall Rule"
         * Give it a name
         * Priority: 999
         * Direction of traffic: Ingress
         * Action on match: Allow
         * Target: Specified target tags
-        * Target tags: <your instance name>
+        * Target tags: your_instance_name
         * Source IP ranges: 0.0.0.0/0
         * Protocols and ports: select TCP with port 5000
    
@@ -126,8 +133,9 @@ it is a workaround to manage multiple parameters be passed to the docker ENDPOIN
             gcloud compute firewall-rules create mlflow-server \
             --direction=INGRESS --priority=999 --network=default \
             --action=ALLOW --rules=tcp:5000 --source-ranges=0.0.0.0/0 \
-            --target-tags=mlflow-server
+            --target-tags=your_instance_name
             ```
+        Replace 'your_instance_name' with your actual instance name
 
     * Create Cloud Storage Bucket
         ![Open SSH](/doc/images/storage_menu.png)
@@ -155,8 +163,9 @@ it is a workaround to manage multiple parameters be passed to the docker ENDPOIN
         ```
 
     * Add Google Application Credentials
-        In order for our scripts to log to the server, we need to modify our code by providing some credentials as
-        environment variables.
+        
+        In order for your scripts to log to the server, you need to modify your code by providing
+        Google Application Credentials as environment variable.
         
         Follow the steps [here](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#creating_service_account_keys)
         to create new service account key and download it locally.
@@ -168,6 +177,7 @@ it is a workaround to manage multiple parameters be passed to the docker ENDPOIN
         ```
 
     * Install Google Cloud Storage
+    
         google-cloud-storage package is required to be installed on both the client and server in order to access Google Cloud Storage
         ```
         pip3 install google-cloud-storage
@@ -178,3 +188,6 @@ it is a workaround to manage multiple parameters be passed to the docker ENDPOIN
     from google.cloud import storage
     client = storage.Client()
     ```
+
+A full example on how to use MLFlow is provided in
+[components/linear_regression_training/src/model_training.py](/components/linear_regression_training/src/model_training.py)

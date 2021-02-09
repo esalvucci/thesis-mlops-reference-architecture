@@ -1,6 +1,5 @@
 # [Google Cloud Build](https://cloud.google.com/cloud-build)
-Google Cloud Build is the CI/CD tool by Google;
-it provides different actions on docker containers (build, push, deploy, etc..).
+Google Cloud Build is the CI/CD tool by Google.
 
 In this project Google Cloud build is used for the Continuous integration of the ML system.
 A trigger in Google Cloud Build will build all the Kubeflow components (as docker containers)

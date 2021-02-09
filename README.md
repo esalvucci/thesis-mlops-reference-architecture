@@ -9,14 +9,14 @@ as use case example. The original code has been edited such to adapt it for the 
 
 You can find the documentation about how each technology is used in the [doc](doc) folder 
 
-In this project is used preferably Free Software (except for Google Cloud Build).
+In this project is used preferably Free Software (except for Google Cloud Build and Google Cloud Functions).
 
 ## Technologies
 Use the following links to read the detailed documentation about how each technology is used in this project.
 
-* [MLFlow](doc/mlflow) - Used to track the experiments log, the model versions and to store them in a Model Registry
-* [Kubeflow](doc/kubeflow) - Used to orchestrate the ML workflow
-* [BentoML](doc/bentoml)
+* [MLFlow](doc/mlflow) - Tracks the experiments log, the model versions and to store them in a Model Registry
+* [Kubeflow](doc/kubeflow) - Orchestrates the ML workflow
+* [BentoML](doc/bentoml) - Used as serving framework 
 * Google Cloud Platform
     * [Google Cloud Build](doc/google_cloud_build) - Used to build a CI pipeline 
     * [Google Cloud Functions](doc/google_cloud_functions) - Used to run the Kubeflow pipeline whenever
@@ -35,15 +35,15 @@ followed by the name (or the logo) of the technologies that address that challen
   ![Google Cloud Build](doc/images/gcb_logo_30x30.png)
 Auto retrain
 * ![Kubeflow](doc/images/kubeflow_logo_30x30.png) Validate the model and the data (as steps of the pipeline)
-* ![Kubeflow](doc/images/kubeflow_logo_30x30.png), ![Google Cloud Functions](doc/images/gcf_logo_30x30.png)
+* ![Kubeflow](doc/images/kubeflow_logo_30x30.png) ![Google Cloud Functions](doc/images/gcf_logo_30x30.png)
 Data Drift
 * ![MLFlow](doc/images/mlflow-logo_20x20.png) Increase collaboration between teams
 * ![MLFlow](doc/images/mlflow-logo_20x20.png) Track the parameters used for the model training, the metrics and the model itself
 * ![MLFlow](doc/images/mlflow-logo_20x20.png) Version your model
 * CI/CD + CT
-    * ![Kubeflow](doc/images/kubeflow_logo_30x30.png), ![Google Cloud Build](doc/images/gcb_logo_30x30.png)
+    * ![Kubeflow](doc/images/kubeflow_logo_30x30.png) ![Google Cloud Build](doc/images/gcb_logo_30x30.png)
     Continuous Integration
-    * ![Kubeflow](doc/images/kubeflow_logo_30x30.png), ![Google Cloud Functions](doc/images/gcf_logo_30x30.png)
+    * ![Kubeflow](doc/images/kubeflow_logo_30x30.png) ![Google Cloud Functions](doc/images/gcf_logo_30x30.png)
     Continuous Training
 
 ## Architecture
