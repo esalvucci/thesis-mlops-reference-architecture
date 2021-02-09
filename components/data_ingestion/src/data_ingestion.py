@@ -11,69 +11,67 @@ logger = SingletonLogger.get_logger()
 columns = np.array(['start', 'end', 'load'])
 
 
-def get_all_files_in_bucket(bucket_name):
+def get_data(bucket_name):
+    """
+    Retrieves the dataset from a bucket on Google Cloud Storage and save it in a local file.
+
+    gs://<bucket_name/
+
+    :param bucket_name - The name of the bucket.
+    """
+    local_folder_path = '/tmp/'
+    __remove_csv_files_in(local_folder_path)
+    try:
+        blobs = __get_all_files_in_bucket(bucket_name)
+        for b in blobs:
+            name = b.name
+            b.download_to_filename(local_folder_path + name)
+        df = __get_df_from_files_in(__get_all_files_with_dataset_columns_in(local_folder_path))
+        __remove_imported_files_from(local_folder_path)
+        df.sort_values(by=['start'], inplace=True, ascending=True)
+        output_path = local_folder_path + 'dataset.csv'
+        df.to_csv(output_path, index=False)
+        logger.info("Data saved in " + output_path)
+    except NotFound:
+        logger.error("File or Bucket have not been found")
+
+
+def __get_all_files_in_bucket(bucket_name):
     storage_client = storage.Client()
-    # Note: Client.list_blobs requires at least package version 1.17.0.
     return storage_client.list_blobs(bucket_name)
 
 
-def dataset_columns_match_with(df_columns):
+def __dataset_columns_match_with(df_columns):
     comparison = columns == np.array(df_columns)
     return comparison.all()
 
 
-def get_all_feasible_files_in(directory):
+def __get_all_files_with_dataset_columns_in(directory):
     files = glob.glob(directory + "*.csv")
     feasible_files = []
     for file in files:
         df = pd.read_csv(file, nrows=1)
-        if dataset_columns_match_with(df.columns):
+        if __dataset_columns_match_with(df.columns):
             feasible_files.append(file)
     return feasible_files
 
 
-def get_df_from_files_in(files_list):
+def __get_df_from_files_in(files_list):
     df_list = []
     for filename in files_list:
         df_list.append(pd.read_csv(filename))
     return pd.concat(df_list)
 
 
-def remove_imported_files_from(directory):
-    for file in get_all_feasible_files_in(directory):
+def __remove_imported_files_from(directory):
+    for file in __get_all_files_with_dataset_columns_in(directory):
         os.remove(file)
 
 
-def remove_files_in(folder):
+def __remove_csv_files_in(folder):
     files = glob.glob(folder + "*.csv")
     for f in files:
         os.remove(f)
-
-
-def get_data(bucket_name):
-    """
-    Retrieves the dataset from a bucket on Google Cloud Storage
-
-    gs://<bucket_name/
-
-    :param bucket_name - The name of the bucket
-    """
-    local_folder_path = '/tmp/'
-    remove_files_in(local_folder_path)
-    try:
-        blobs = get_all_files_in_bucket(bucket_name)
-        for b in blobs:
-            name = b.name
-            b.download_to_filename(local_folder_path + name)
-        df = get_df_from_files_in(get_all_feasible_files_in(local_folder_path))
-        remove_imported_files_from(local_folder_path)
-        df.sort_values(by=['start'], inplace=True, ascending=True)
-
-        output_path = local_folder_path + 'dataset.csv'
-        df.to_csv(output_path, index=False)
-        logger.info("Data saved in " + output_path)
-    except NotFound:
-        logger.error("File or Bucket have not been found")
 
 
 if __name__ == "__main__":
