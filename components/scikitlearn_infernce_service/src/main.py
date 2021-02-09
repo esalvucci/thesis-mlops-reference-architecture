@@ -8,7 +8,7 @@ logger = SingletonLogger.get_logger()
 
 def build_service(model_path):
     """
-    Retreive a model from mlflow model registry, pack it into a BentoService, and save and register the
+    Retreive a model from the MLFlow Model Registry, pack it into a BentoService, and save and register the
     BentoService via BentoML’s built-in model management system.
     """
     model = mlflow.sklearn.load_model(model_path)

@@ -12,11 +12,12 @@ from google.cloud import storage
 client = storage.Client()
 logger = SingletonLogger.get_logger()
 metrics_info = {'metrics': []}
+test_set_size = 0.33
 
 
 def train_model(dataset_path, original_dataset_path, penalty, tol, random_state):
     """
-    Trains a SGD Regressor model and save it on the MLFlow Model Registry.
+    Train a SGD Regressor model and save it on the MLFlow Model Registry.
     :param dataset_path: The path of the dataset to be used for the training.
     :param original_dataset_path: The path of the dataset before the data preparation phase.
     :param penalty: The penalty (aka regularization term) to be use
@@ -25,7 +26,7 @@ def train_model(dataset_path, original_dataset_path, penalty, tol, random_state)
     """
     model_name = "sgd_regressor"
     dataset = pd.read_csv(dataset_path).set_index('time')
-    training_set, test_set = train_test_split(dataset, test_size=0.33)
+    training_set, test_set = train_test_split(dataset, test_size=test_set_size)
     x_training_set, y_training_set = __split_into_x_y(training_set)
     x_test_set, y_test_set = __split_into_x_y(test_set)
     experiment = __get_mlflow_experiment(model_name)
@@ -44,14 +45,6 @@ def train_model(dataset_path, original_dataset_path, penalty, tol, random_state)
         rmse = np.sqrt(mean_squared_error(y_test_pred, y_test_set))
         __log_metric("rmse", rmse)
         __save(model, model_name)
-
-
-def __split_into_x_y(data):
-    target_column = "load"
-    x = data.drop(columns=target_column)
-    y = data.loc[:, target_column]
-    logger.info("Data splitted into x and y")
-    return x, y
 
 
 def __save(model, name):
@@ -76,13 +69,27 @@ def __log_parameter(name, value):
 
 def __log_metric(name, value):
     """
-    Logs a metric in the MLFlow server
+    Logs a metric in the MLFlow server (and also in a local file)
     :param name - The name of the metric
     :param value - The value of the metric
     """
     logger.info(name + ": " + str(value))
     mlflow.log_metric(name, value)
     __save_metric_to_file(name, value)
+
+
+def __get_mlflow_experiment(name):
+    """
+    Get an experiment from the MLFlow server
+    :param name - The name of the experiment
+    """
+    if not mlflow.get_experiment_by_name(name):
+        mlflow.create_experiment(name=name)
+    return mlflow.get_experiment_by_name(name)
+
+
+def __get_model(penalty, tol, random_state):
+    return SGDRegressor(penalty=penalty, tol=tol, random_state=random_state, verbose=True)
 
 
 def __save_metric_to_file(name, value):
@@ -99,18 +106,12 @@ def __save_metric_to_file(name, value):
         value_file.write(str(value))
 
 
-def __get_mlflow_experiment(name):
-    """
-    Get an experiment from the MLFlow server
-    :param name - The name of the experiment
-    """
-    if not mlflow.get_experiment_by_name(name):
-        mlflow.create_experiment(name=name)
-    return mlflow.get_experiment_by_name(name)
-
-
-def __get_model(penalty, tol, random_state):
-    return SGDRegressor(penalty=penalty, tol=tol, random_state=random_state, verbose=True)
+def __split_into_x_y(data):
+    target_column = "load"
+    x = data.drop(columns=target_column)
+    y = data.loc[:, target_column]
+    logger.info("Data splitted into x and y")
+    return x, y
 
 
 if __name__ == "__main__":

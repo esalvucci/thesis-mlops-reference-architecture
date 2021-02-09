@@ -8,10 +8,11 @@ logger = SingletonLogger.get_logger()
 
 def load(model_name, stage='Production'):
     """
-    Loads a model from the MLFlow Model Registry at the URI specified in the MLFLOW_TRACKING_URI env variable.
+    Loads a model from the MLFlow Model Registry at the URI specified in the MLFLOW_TRACKING_URI env variable and
+    save it in a local directory.
     :param model_name - The name of the model to be retreived
     :param stage - The stage of the model to be retreived, either 'Staging' or 'Production'
-    :param experiment_name - The experiment
+    :param experiment_name - The experiment name
     """
     output_path = '/tmp/model'
     try:

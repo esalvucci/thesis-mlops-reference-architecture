@@ -6,7 +6,7 @@ import os
 import logging
 from kubernetes.client import V1EnvVar
 
-HOST = 'https://34727f9010a6d1aa-dot-asia-east1.pipelines.googleusercontent.com'
+HOST = <KUBEFLOW HOST>
 EXPERIMENT_NAME = 'Forecast Example - Training'
 
 
@@ -68,7 +68,8 @@ def pipeline(bucket_name: str = 'forecast-example'):
                                                                             V1EnvVar(name='MLFLOW_TRACKING_URI',
                                                                             value=os.environ['MLFLOW_TRACKING_URI']))
 
-#    random_forest_model_training.execution_options.caching_strategy.max_cache_staleness = "P0D"
+    # Avoid to cache the output of the following steps
+    random_forest_model_training.execution_options.caching_strategy.max_cache_staleness = "P0D"
     linear_regression_model_training.execution_options.caching_strategy.max_cache_staleness = "P0D"
 
 

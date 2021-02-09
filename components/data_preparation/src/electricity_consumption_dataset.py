@@ -12,11 +12,10 @@ logger = SingletonLogger.get_logger()
 
 class ElectricityConsumptionDataset:
     """
-    This class encapsulates the electricity consumption dataset and let to perform some data preparation steps on it
+    Class which encapsulates the electricity consumption dataset and let to perform some data preparation steps on it
     """
     def __init__(self, df):
         self.df = df
-#        self.training_set, self.test_set = train_test_split(self.df, test_size=0.33)
         self.feature_names = []
         self.column_transformer = ColumnTransformer([])
         self.df = self.__add_all_features(self.df).dropna()
@@ -24,7 +23,7 @@ class ElectricityConsumptionDataset:
 
     def get_transformed_dataset(self):
         """
-        :return:
+        :return: The transformed dataset
         """
         data = self.column_transformer.transform(self.df)
         columns = self.feature_names

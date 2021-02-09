@@ -3,10 +3,9 @@ FROM python:3.8-slim-buster
 WORKDIR /app/src
 
 COPY requirements.txt ../
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y git wget
+RUN apt-get update && apt-get upgrade -y && apt-get install -y git wget
 
+# Download and install conda, required by mlflow
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 RUN bash Miniconda3-latest-Linux-x86_64.sh -b
 RUN rm Miniconda3-latest-Linux-x86_64.sh

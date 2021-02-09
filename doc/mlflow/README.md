@@ -11,7 +11,7 @@ In this repository both the components [linear_regression_training](/components/
 [random_forest_regressor_training](/components/random_forest_regressor_training) use MLFlow to track parameters, metrics
 and to log the model to the Model Registry.
 
-The [model_loader](/components/model_loader) component shows how to load a model from the Model Registry and
+The [model_loader](/components/load_model) component shows how to load a model from the Model Registry and
 [promote_model](/components/promote_model) uses MLFlow to promote a model to 'Production' by tagging it
 in the Model Registry. 
 

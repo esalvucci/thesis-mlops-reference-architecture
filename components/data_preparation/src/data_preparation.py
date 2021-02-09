@@ -8,9 +8,8 @@ logger = SingletonLogger.get_logger()
 
 def prepare_data(dataset_path):
     """
-    Prepares the dataset to be used in the model training phase
+    Prepares the dataset to be used in the model training phase and save it in a local file as output.
     :param dataset_path - The path for the incoming dataset
-    :return:
     """
     output_path = '/tmp/dataset.csv'
     df = pd.read_csv(dataset_path)

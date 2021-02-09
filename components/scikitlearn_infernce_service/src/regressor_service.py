@@ -11,7 +11,7 @@ logger = SingletonLogger.get_logger()
 @artifacts([SklearnModelArtifact('model')])
 class ElectricityConsumptionRegressorService(BentoService):
     """
-    A minimum prediction service exposing a sklearn model
+    A prediction service exposing a sklearn model
     """
 
     @api(input=DataframeInput(), batch=True)

@@ -12,7 +12,7 @@ dependencies:
   - click
   - cryptography
   - pip:
-      - holidays
+
       - sklearn
       - mlflow
       - google-cloud-storage
