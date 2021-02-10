@@ -67,17 +67,19 @@ You will note a new trigger in the "History" whenever you push to the selected b
 The Kubeflow (training) pipeline will be compiled and run using, as input, the data that have been added in the target
  bucket.
  
-To deploy a new Function run 
- ```
-gcloud functions deploy run_pipeline --runtime python37 --trigger-resource ${TRIGGER_BUCKET}
---trigger-event google.storage.object.finalize --env-vars-file .env.yaml
-```
+To deploy a new Function first delete the existing one
 
-To delete an existing function run
 ```
 gcloud functions delete <function name>
 ```
 
 ```gcloud functions delete run_pipeline``` according to this example.
+
+then run 
+
+ ```
+gcloud functions deploy run_pipeline --runtime python37 --trigger-resource ${TRIGGER_BUCKET}
+--trigger-event google.storage.object.finalize --env-vars-file .env.yaml
+```
 
 (where run_pipeline is the name of the function, in your python code, to be run )

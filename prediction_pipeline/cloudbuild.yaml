@@ -16,8 +16,10 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_INFERENCE_SERVICE:$SHORT_SHA', '.']
     dir: $_COMPONENTS_FOLDER/$_INFERENCE_SERVICE
-    env:
-      - 'MLFLOW_TRACKING_URI=$_MLFLOW_TRACKING_URI'
+  # Build the component of the Kubeflow Pipeline
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'build', '-t', '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_BATCH_PREDICTION:$SHORT_SHA', '.' ]
+    dir: $_COMPONENTS_FOLDER/$_BATCH_PREDICTION
 
   # Through the kfp-cli compile the pipeline
   - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
@@ -31,6 +33,7 @@ steps:
       - 'DATA_INGESTION=$_DATA_INGESTION'
       - 'MODEL_LOADER=$_MODEL_LOADER'
       - 'INFERENCE_SERVICE=$_INFERENCE_SERVICE'
+      - 'BATCH_PREDICTION=$_BATCH_PREDICTION'
       - 'MLFLOW_TRACKING_URI=$_MLFLOW_TRACKING_URI'
     args:
       - '-c'
