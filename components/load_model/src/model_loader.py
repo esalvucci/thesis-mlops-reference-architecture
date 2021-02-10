@@ -20,7 +20,7 @@ def load(model_name, stage='Production'):
         mlflow.sklearn.save_model(model, output_path)
         logger.info("Model loaded and saved in " + output_path)
     except RestException:
-        logger.error("The model with name " + model_name + " and stage " + stage + "has not been found")
+        logger.error("The model with name " + model_name + " in stage " + stage + " has not been found")
 
 
 if __name__ == "__main__":

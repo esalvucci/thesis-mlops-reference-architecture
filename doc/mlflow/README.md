@@ -56,7 +56,7 @@ component).
 You also need to install git in your Docker container. Refer to this
 [Issue](https://github.com/esalvucci/mlops-architecture-example/issues/1) for further details about that.
 
-The [run_mlflow.sh](/components/linear_regression_training/run_mlflow.sh) script is used now to run mlflow.
+The [run_mlflow.sh](/components/linear_regression_training/docker_endpoint.sh) script is used now to run mlflow.
 As the Kubeflow pipleine has to pass multiple parameters to the component wich uses mlflow, using a bash script to run
 it is a workaround to manage multiple parameters to be passed to the docker ENDPOINT.
 

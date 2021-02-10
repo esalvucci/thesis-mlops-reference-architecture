@@ -17,7 +17,7 @@ RUN mkdir config
 COPY config/ config/
 COPY src/ src/
 COPY MLProject ./
-COPY run_mlflow.sh ./
+COPY docker_endpoint.sh ./
 
-RUN ["chmod", "+x", "run_mlflow.sh"]
-ENTRYPOINT ["/bin/bash", "run_mlflow.sh"]
+RUN ["chmod", "+x", "docker_endpoint.sh"]
+ENTRYPOINT ["/bin/bash", "docker_endpoint.sh"]

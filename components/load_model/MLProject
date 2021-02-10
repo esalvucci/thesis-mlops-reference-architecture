@@ -1,4 +1,4 @@
-name: stock_forecast
+name: forecast-example
 
 conda_env: config/mlflow_env.yaml
 
@@ -7,4 +7,4 @@ entry_points:
     parameters:
       model_name: str
       stage: {type: str, default: 'Production'}
-    command: "python3 src/model_promoter.py"
+    command: "python3 src/model_loader.py {model_name} {stage}"

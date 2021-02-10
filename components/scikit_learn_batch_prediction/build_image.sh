@@ -1,6 +1,6 @@
 #!/bin/bash
 pipeline_name='forecasting_example'
-component_name='inference'
+component_name='scikit_learn_batch_prediction'
 docker_container=$DOCKER_CONTAINER_REGISTRY_BASE_URL
 image_name=${docker_container}/${pipeline_name}/${component_name}
 image_tag=latest

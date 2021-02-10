@@ -1,8 +1,9 @@
 FROM python:3.8-slim-buster
 
-WORKDIR /app/src
+WORKDIR /app
 
-COPY requirements.txt ../
+COPY requirements.txt .
+
 RUN apt-get update && apt-get upgrade -y && apt-get install -y git wget
 
 # Download and install conda, required by mlflow
@@ -11,12 +12,14 @@ RUN bash Miniconda3-latest-Linux-x86_64.sh -b
 RUN rm Miniconda3-latest-Linux-x86_64.sh
 ENV PATH="/root/miniconda3/bin:${PATH}"
 
-RUN pip3 install -r ../requirements.txt
+RUN pip3 install -r requirements.txt
 RUN mkdir src
+RUN mkdir config
 
+COPY config/ config/
 COPY src/ src/
 COPY MLProject ./
-COPY run_mlflow.sh ./
+COPY docker_endpoint.sh ./
 
-RUN ["chmod", "+x", "run_mlflow.sh"]
-ENTRYPOINT ["/bin/bash", "run_mlflow.sh"]
+RUN ["chmod", "+x", "docker_endpoint.sh"]
+ENTRYPOINT ["/bin/bash", "docker_endpoint.sh"]

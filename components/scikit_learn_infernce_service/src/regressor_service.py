@@ -2,9 +2,6 @@ import pandas as pd
 from bentoml import env, artifacts, api, BentoService
 from bentoml.adapters import DataframeInput
 from bentoml.frameworks.sklearn import SklearnModelArtifact
-from utility.singleton_logger import SingletonLogger
-
-logger = SingletonLogger.get_logger()
 
 
 @env(infer_pip_packages=True)

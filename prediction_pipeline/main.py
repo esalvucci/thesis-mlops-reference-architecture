@@ -3,24 +3,50 @@ import os
 from kfp import components
 from kubernetes.client import V1EnvVar
 
-xgboost_predict_on_csv_op = components.load_component_from_url('https://raw.githubusercontent.com/kubeflow/'
-                                                               'pipelines/master/'
-                                                               'components/XGBoost/Predict/component.yaml')
 drop_header_op = components.load_component_from_url('https://raw.githubusercontent.com/kubeflow/'
                                                     'pipelines/master/components/tables/Remove_header/component.yaml')
 
 
-def __data_ingestion_step(file_name: str):
+@kfp.dsl.pipeline(name='Forecasting Example')
+def __pipeline(bucket_name: str = 'forecast-example-prediction', model_stage: str = 'Production'):
+    model_name = 'sgd_regressor'
+    data_ingestion = __data_ingestion_step(bucket_name)
+    data_preparation = __data_preparation_step(data_ingestion.output)
+    drop_header = drop_header_op(data_preparation.output)
+    load_model = __load_model_step(model_name, model_stage)
+    load_model.container.add_env_variable(V1EnvVar(name='MLFLOW_TRACKING_URI',
+                                                   value=os.environ['MLFLOW_TRACKING_URI']))
+    inference_service = __bentoml_service(load_model.outputs['model_path'],
+                                          load_model.outputs['conda_configuration_file'],
+                                          load_model.outputs['model_metadata'])
+    batch_prediction = __scikit_learn_batch_prediction(drop_header.output, inference_service.output)
+
+    # Avoid caching the output of the following steps
+    # https://www.kubeflow.org/docs/pipelines/caching/#managing-caching-staleness
+    data_ingestion.execution_options.caching_strategy.max_cache_staleness = "P0D"
+    load_model.execution_options.caching_strategy.max_cache_staleness = "P0D"
+    inference_service.execution_options.caching_strategy.max_cache_staleness = "P0D"
+    batch_prediction.execution_options.caching_strategy.max_cache_staleness = "P0D"
+
+
+def __data_ingestion_step(bucket_name):
     return kfp.dsl.ContainerOp(
-            name='data ingestion',
-            image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
-                  '/' + os.environ['PROJECT_NAME'] + '/' + os.environ['DATA_INGESTION'] +':' +
-                  os.environ['TAG'],
-            arguments=['--file_name', file_name],
-            file_outputs={'output': '/tmp/dataset.csv'}
+            name='data_ingestion',
+            image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] + '/' + os.environ['PROJECT_NAME'] + '/' +
+                  os.environ['DATA_INGESTION'] + ':' + os.environ['TAG'],
+            arguments=['--bucket_name', bucket_name],
+            file_outputs={'dataset_path': '/tmp/dataset.csv'}
     )
 
-# Data preparaton
+
+def __data_preparation_step(dataset_path):
+    return kfp.dsl.ContainerOp(
+            name='data_preparation',
+            image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] + '/' + os.environ['PROJECT_NAME'] + '/' +
+                  os.environ['DATA_PREPARATION'] + ':' + os.environ['TAG'],
+            arguments=['--dataset_path', kfp.dsl.InputArgumentPath(dataset_path)],
+            file_outputs={'output_path': '/tmp/dataset.csv'}
+    )
 
 
 def __load_model_step(model_name, model_stage):
@@ -39,27 +65,27 @@ def __load_model_step(model_name, model_stage):
 
 def __bentoml_service(model_path, conda_configuration_file, model_metadata):
     return kfp.dsl.ContainerOp(
-            name='inference-service',
+            name='scikit_learn_inference_service',
             image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
                   '/' + os.environ['PROJECT_NAME'] + '/' + os.environ['INFERENCE_SERVICE'] + ':' +
                   os.environ['TAG'],
-            arguments=['--model_path', model_path,
-                       '--conda_configuration_file', conda_configuration_file,
-                       '--model_metadata', model_metadata]
+            arguments=['--model_path', kfp.dsl.InputArgumentPath(model_path),
+                       '--conda_configuration_file', kfp.dsl.InputArgumentPath(conda_configuration_file),
+                       '--model_metadata', kfp.dsl.InputArgumentPath(model_metadata)],
+            file_outputs={'bento_service_zip': '/tmp/bentoservice.zip'}
     )
 
 
-@kfp.dsl.pipeline(name='Forecasting Example')
-def __pipeline(prediction_dataset_name='de.csv', model_stage: str = 'Production'):
-    model_name = 'random_forest_regressor'
-    data_ingestion = __data_ingestion_step(prediction_dataset_name)
-    drop_header = drop_header_op(data_ingestion.output)
-    load_model = __load_model_step(model_name, model_stage)
-    load_model.container.add_env_variable(V1EnvVar(name='MLFLOW_TRACKING_URI',
-                                                   value=os.environ['MLFLOW_TRACKING_URI']))
-
-    data_ingestion.execution_options.caching_strategy.max_cache_staleness = "P0D"
-    load_model.execution_options.caching_strategy.max_cache_staleness = "P0D"
+def __scikit_learn_batch_prediction(dataset_path, bento_service_zip='/tmp/bentoservice.zip'):
+    return kfp.dsl.ContainerOp(
+            name='scikit_learn_batch_prediction',
+            image=os.environ['DOCKER_CONTAINER_REGISTRY_BASE_URL'] +
+                  '/' + os.environ['PROJECT_NAME'] + '/' + os.environ['BATCH_PREDICTION'] + ':' +
+                  os.environ['TAG'],
+            arguments=['--dataset_path', kfp.dsl.InputArgumentPath(dataset_path),
+                       '--bento_service', kfp.dsl.InputArgumentPath(bento_service_zip)],
+            file_outputs={'prediction': '/tmp/prediction.csv'}
+    )
 
 
 if __name__ == '__main__':

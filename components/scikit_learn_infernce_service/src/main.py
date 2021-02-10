@@ -1,9 +1,9 @@
 import fire
-from utility.singleton_logger import SingletonLogger
 from regressor_service import ElectricityConsumptionRegressorService
 import mlflow
 
-logger = SingletonLogger.get_logger()
+service_name = 'electricity_consumption_regressor_service'
+service_path = '/tmp/bentoservice'
 
 
 def build_service(model_path):
@@ -14,7 +14,7 @@ def build_service(model_path):
     model = mlflow.sklearn.load_model(model_path)
     electricity_consumption_regressor_service = ElectricityConsumptionRegressorService()
     electricity_consumption_regressor_service.pack('model', model)
-    electricity_consumption_regressor_service.save()
+    electricity_consumption_regressor_service.save_to_dir(path=service_path)
 
 
 if __name__ == "__main__":

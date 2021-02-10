@@ -1,4 +1,4 @@
-name: stock_forecast
+name: forecast-example
 
 conda_env: config/mlflow_env.yaml
 
@@ -6,7 +6,7 @@ entry_points:
   main:
     parameters:
       dataset_path: path
-      original_dataset_path: path
+      original_dataset_path: str
       penalty: {type: str, default: 'elasticnet'}
       tol: {type: int, default: 10}
       random_state: {type: int, default: 42}
