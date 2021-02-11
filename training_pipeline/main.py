@@ -70,6 +70,8 @@ def pipeline(bucket_name: str = 'forecast-example'):
 
     # Avoid caching the output of the following steps
     # https://www.kubeflow.org/docs/pipelines/caching/#managing-caching-staleness
+    data_ingestion.execution_options.caching_strategy.max_cache_staleness = "P0D"
+    data_preparation.execution_options.caching_strategy.max_cache_staleness = "P0D"
     random_forest_model_training.execution_options.caching_strategy.max_cache_staleness = "P0D"
     linear_regression_model_training.execution_options.caching_strategy.max_cache_staleness = "P0D"
 
