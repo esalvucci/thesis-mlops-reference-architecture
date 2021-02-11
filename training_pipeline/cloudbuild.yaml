@@ -44,6 +44,7 @@ steps:
       - 'DATA_PREPARATION=$_DATA_PREPARATION'
       - 'MODEL_TRAINING=$_MODEL_TRAINING'
       - 'MLFLOW_TRACKING_URI=$_MLFLOW_TRACKING_URI'
+      - 'KUBEFLOW_HOST=$_ENDPOINT'
     args:
       - '-c'
       # dsl-compile --py <PYHTON_FILE_NAME> --output <COMPILED_PIPELINE_FILENAME>
