@@ -59,12 +59,12 @@ def pipeline(bucket_name: str = 'forecast-example'):
     # Promote the best between the two models
     with kfp.dsl.Condition(
             random_forest_model_training.outputs['rmse'] > linear_regression_model_training.outputs['rmse']):
-        __promotion_step(random_forest_regressor_component_name).container.add_env_variable(
+        __promotion_step('random_forest_regressor').container.add_env_variable(
                                                                             V1EnvVar(name='MLFLOW_TRACKING_URI',
                                                                             value=os.environ['MLFLOW_TRACKING_URI']))
     with kfp.dsl.Condition(
             random_forest_model_training.outputs['rmse'] <= linear_regression_model_training.outputs['rmse']):
-        __promotion_step(sgd_regressor_component_name).container.add_env_variable(
+        __promotion_step('sgd_regressor').container.add_env_variable(
                                                                             V1EnvVar(name='MLFLOW_TRACKING_URI',
                                                                             value=os.environ['MLFLOW_TRACKING_URI']))
 
