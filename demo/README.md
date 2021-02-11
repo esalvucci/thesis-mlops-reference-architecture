@@ -3,7 +3,7 @@
 ## Getting started
 
 ### Datasets
-You can find the datasets used in this repository in [](/demo/datasets)
+You can find the datasets used in this repository in [/demo/datasets](/demo/datasets)
 
 ### Prerequisites
 To run a demo of the whole system first install
