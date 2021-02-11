@@ -10,11 +10,11 @@ on Kubernetes, through Kubeflow.
 pip3 install bentoml scikit-learn
 ```
  
-The code for this example is in [/components/scikitlearn_infernce_service](/components/scikit_learn_infernce_service).
+The code for this example is in [/components/scikitlearn_infernce_service](/components/scikit_learn_inference_service).
 
 ## BentoML Service
 The class ElectricityConsumptionRegressorService, in
-[src/regressor_service.py](/components/scikit_learn_infernce_service/src/regressor_service.py), extends bentoml.BentoService,
+[src/regressor_service.py](/components/scikit_learn_inference_service/src/regressor_service.py), extends bentoml.BentoService,
 the base class for building such prediction services using BentoML.
 
 [[From the doc]](https://docs.bentoml.org/en/latest/concepts.html)
@@ -75,7 +75,7 @@ Now you can deploy your BentoService to Kubernetes. To do that you will create a
 Deployment.
 
 The yaml file for this example is in
-[electricity-consumption-regressor.yaml](/components/scikit_learn_infernce_service/electricity-consumption-regressor.yaml)
+[electricity-consumption-regressor.yaml](/components/scikit_learn_inference_service/electricity-consumption-regressor.yaml)
 
 Replace <DOCKER_CONTAINER_REGISTRY> with your Docker Hub uri and username (or gcr.io or other).
 
