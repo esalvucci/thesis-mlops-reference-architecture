@@ -6,7 +6,7 @@ import os
 import logging
 from kubernetes.client import V1EnvVar
 
-HOST = 'https://34727f9010a6d1aa-dot-asia-east1.pipelines.googleusercontent.com'
+HOST = os.environ['KUBEFLOW_HOST']
 EXPERIMENT_NAME = 'Forecast Example - Training'
 
 
@@ -32,7 +32,7 @@ def run_pipeline(data, context):
 
 @kfp.dsl.pipeline(name='Forecasting Example')
 def pipeline(bucket_name: str = 'forecast-example'):
-    original_dataset_path = str(os.path.join('gs://', 'forecast-example', 'it.csv'))
+    original_dataset_path = 'gs://forecast-example/it.csv'
 
     # Data Ingestion step
     data_ingestion = __data_ingestion_step(bucket_name)
