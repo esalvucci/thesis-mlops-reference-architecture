@@ -41,7 +41,7 @@ def pipeline(bucket_name: str = 'forecast-example'):
     data_preparation = __data_preparation_step(data_ingestion.output)
 
     # Training of the linear regression model
-    sgd_regressor_component_name = 'sgd_regressor'
+    sgd_regressor_component_name = os.environ['LINEAR_REGRESSION_TRAINING']
     linear_regression_model_training = __model_training_step(sgd_regressor_component_name,
                                                              data_preparation.output,
                                                              original_dataset_path)
@@ -49,7 +49,7 @@ def pipeline(bucket_name: str = 'forecast-example'):
                                                                          value=os.environ['MLFLOW_TRACKING_URI']))
 
     # Training of the linear regression model
-    random_forest_regressor_component_name = 'random_forest_regressor'
+    random_forest_regressor_component_name = os.environ['RANDOM_FOREST_REGRESSOR_TRAINING']
     random_forest_model_training = __model_training_step(random_forest_regressor_component_name,
                                                          data_preparation.output,
                                                          original_dataset_path)
