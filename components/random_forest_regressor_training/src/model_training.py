@@ -4,7 +4,6 @@ from sklearn.metrics import mean_squared_error
 import pandas as pd
 import fire
 import numpy as np
-from electricity_consumption_dataset import ElectricityConsumptionDataset
 from utility.singleton_logger import SingletonLogger
 import mlflow
 from google.cloud import storage
@@ -26,9 +25,8 @@ def train_model(dataset_path, original_dataset_path, n_estimators, criterion, mi
     """
     model_name = "random_forest_regressor"
     dataset = pd.read_csv(dataset_path)
-    electricity_consumption_dataset = ElectricityConsumptionDataset(dataset)
-    x_training_set, y_training_set = electricity_consumption_dataset.get_training_set()
-    x_test_set, y_test_set = electricity_consumption_dataset.get_test_set()
+    x_training_set, y_training_set = __split_into_x_y(dataset)
+    x_test_set, y_test_set = __split_into_x_y(dataset)
     experiment = __get_mlflow_experiment(model_name)
 
     with mlflow.start_run(experiment_id=experiment.experiment_id):
@@ -110,6 +108,14 @@ def __get_model(n_estimators, criterion, min_samples_leaf, random_state):
         verbose=True,
         n_jobs=4
     )
+
+
+def __split_into_x_y(data):
+    target_col = "load"
+    x = data.drop(columns=target_col)
+    y = data.loc[:, target_col]
+    logger.info("Data splitted into x and y")
+    return x, y
 
 
 if __name__ == "__main__":
