@@ -1,6 +1,6 @@
 #!/bin/bash
 pipeline_name='forecasting_example'
-component_name='sgd_regressor'
+component_name='linear_regression_training'
 docker_container=$DOCKER_CONTAINER_REGISTRY_BASE_URL
 image_name=${docker_container}/${pipeline_name}/${component_name}
 image_tag=$TAG
