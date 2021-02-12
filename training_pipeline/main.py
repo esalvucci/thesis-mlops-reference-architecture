@@ -59,17 +59,19 @@ def pipeline(bucket_name: str = 'forecast-example'):
     # Promote the best between the two models
     with kfp.dsl.Condition(
             random_forest_model_training.outputs['rmse'] > linear_regression_model_training.outputs['rmse']):
-        __promotion_step(random_forest_regressor_component_name).container.add_env_variable(
+        __promotion_step('random_forest_regressor').container.add_env_variable(
                                                                             V1EnvVar(name='MLFLOW_TRACKING_URI',
                                                                             value=os.environ['MLFLOW_TRACKING_URI']))
     with kfp.dsl.Condition(
             random_forest_model_training.outputs['rmse'] <= linear_regression_model_training.outputs['rmse']):
-        __promotion_step(sgd_regressor_component_name).container.add_env_variable(
+        __promotion_step('sgd_regressor').container.add_env_variable(
                                                                             V1EnvVar(name='MLFLOW_TRACKING_URI',
                                                                             value=os.environ['MLFLOW_TRACKING_URI']))
 
     # Avoid caching the output of the following steps
     # https://www.kubeflow.org/docs/pipelines/caching/#managing-caching-staleness
+    data_ingestion.execution_options.caching_strategy.max_cache_staleness = "P0D"
+    data_preparation.execution_options.caching_strategy.max_cache_staleness = "P0D"
     random_forest_model_training.execution_options.caching_strategy.max_cache_staleness = "P0D"
     linear_regression_model_training.execution_options.caching_strategy.max_cache_staleness = "P0D"
 
