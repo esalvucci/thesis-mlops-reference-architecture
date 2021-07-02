@@ -4,7 +4,7 @@ This example shows how to install an mlflow server on Google Cloud Platform and 
 run mlflow either from your local machine or within a docker container (for example to
 run mlflow in a component of a Kubeflow pipeline).
 
-See the (Official Documentation](https://mlflow.org/docs/latest/index.html) for further details about MLFlow features.
+See the [Official Documentation](https://mlflow.org/docs/latest/index.html) for further details about MLFlow features.
 
 ## MLFlow usage in this repository 
 In this repository both the components [linear_regression_training](/components/linear_regression_training) and
