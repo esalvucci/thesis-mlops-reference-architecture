@@ -31,8 +31,8 @@ def run_pipeline(data, context):
 
 
 @kfp.dsl.pipeline(name='Forecasting Example')
-def pipeline(bucket_name: str = 'forecast-example'):
-    original_dataset_path = 'gs://forecast-example/it.csv'
+def pipeline(bucket_name: str = 'thesis-demo'):
+    original_dataset_path = 'gs://thesis-demo/it.csv'
 
     # Data Ingestion step
     data_ingestion = __data_ingestion_step(bucket_name)
