@@ -37,56 +37,6 @@ steps:
       - 'MLFLOW_TRACKING_URI=$_MLFLOW_TRACKING_URI'
     dir: $_PIPELINE_FOLDER
 
-  # Through the kfp-cli compile the pipeline
-  - name: '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_ID/kfp-cli:latest'
-    # The 'env' property allows to pass the container environment variables
-    # (which values are specified in the trigger settings)
-    env:
-      - 'DOCKER_CONTAINER_REGISTRY_BASE_URL=$_DOCKER_CONTAINER_REGISTRY_BASE_URL'
-      - 'TAG=$SHORT_SHA'
-      - 'HOST=$_ENDPOINT'
-      - 'PROJECT_NAME=$_PROJECT_NAME'
-      - 'DATA_INGESTION=$_DATA_INGESTION'
-      - 'DATA_PREPARATION=$_DATA_PREPARATION'
-      - 'RANDOM_FOREST_REGRESSOR_TRAINING=$_RANDOM_FOREST_REGRESSOR_TRAINING'
-      - 'LINEAR_REGRESSION_TRAINING=$_LINEAR_REGRESSION_TRAINING'
-      - 'PROMOTE_MODEL=$_PROMOTE_MODEL'
-      - 'MLFLOW_TRACKING_URI=$_MLFLOW_TRACKING_URI'
-      - 'KUBEFLOW_HOST=$_ENDPOINT'
-    args:
-      - '-c'
-      # dsl-compile --py <PYHTON_FILE_NAME> --output <COMPILED_PIPELINE_FILENAME>
-      - 'dsl-compile --py main.py --output training_pipeline.tar.gz'
-    dir: $_PIPELINE_FOLDER
-
-  # Through the kfp-cli upload a new version of it to the Kubeflow Pipeline specified endpoint.
-  - name: '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_ID/kfp-cli:latest'
-    args:
-      - '-c'
-
-      # kfp --endpoint <ENDPOINT_URI> pipeline upload-version -p <PIPELINE_ID> -v <VERSION_ID> <COMPILED_PIPELINE_FILENAME>
-      # Note that ++ the pipeline must exist here ++. If the pipeline does not exists an exception will be thrown.
-      # To get the PIPELINE_ID dinamically run the command inside the $() as -p argument
-      - 'kfp --endpoint $_ENDPOINT pipeline upload-version -p
-           $(kfp --endpoint $_ENDPOINT pipeline list | grep -w "${_PIPELINE_NAME}"  |
-             grep -E -o -e "([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}")
-         -v ${SHORT_SHA} training_pipeline.tar.gz'
-    dir: $_PIPELINE_FOLDER
-
-  # Through the kfp-cli trigger the new pipeline verison run.
-  - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
-    args:
-      - '-c'
-
-      # kfp --endpoint <ENDPOINT_URI> run submit -e <EXPERIMENT_NAME> -r <RUN_ID> -p <PIPELINE_ID>
-      # To get the PIPELINE_ID dinamically run the command inside the $() as -p argument
-      - 'kfp --endpoint $_ENDPOINT run submit
-              -e "${_PIPELINE_NAME}"
-              -r ${SHORT_SHA}
-              -p $(kfp --endpoint $_ENDPOINT pipeline list | grep -w "${_PIPELINE_NAME}"  |
-                   grep -E -o -e "([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){4}-([a-z0-9]){12}")'
-    dir: $_PIPELINE_FOLDER
-
 # In the args property we build the image locally. We also need to push the built image to a docker container registry.
 # This operation is specified in the 'images' property.
 # Note the lowercase name ('images')
