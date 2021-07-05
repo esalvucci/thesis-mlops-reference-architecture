@@ -38,7 +38,7 @@ steps:
     dir: $_PIPELINE_FOLDER
 
   # Through the kfp-cli compile the pipeline
-  - name: '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_ID/kfp-cli:latest'
+  - name: '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/kfp-cli:latest'
     # The 'env' property allows to pass the container environment variables
     # (which values are specified in the trigger settings)
     env:
@@ -60,7 +60,7 @@ steps:
     dir: $_PIPELINE_FOLDER
 
   # Through the kfp-cli upload a new version of it to the Kubeflow Pipeline specified endpoint.
-  - name: '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_ID/kfp-cli:latest'
+  - name: '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/kfp-cli:latest'
     args:
       - '-c'
 
@@ -74,7 +74,7 @@ steps:
     dir: $_PIPELINE_FOLDER
 
   # Through the kfp-cli trigger the new pipeline verison run.
-  - name: 'gcr.io/$_PROJECT_ID/kfp-cli'
+  - name: '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_ID/kfp-cli'
     args:
       - '-c'
 
@@ -96,5 +96,5 @@ images:
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_LINEAR_REGRESSION_TRAINING:$SHORT_SHA'
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_RANDOM_FOREST_REGRESSOR_TRAINING:$SHORT_SHA'
   - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/$_PROMOTE_MODEL:$SHORT_SHA'
-  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_ID/kfp-cli:latest'
+  - '$_DOCKER_CONTAINER_REGISTRY_BASE_URL/$_PROJECT_NAME/kfp-cli:latest'
 timeout: 900s
